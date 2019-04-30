@@ -1,0 +1,11 @@
+---
+title: "Mosquito and beetle metrics"
+author: "Melissa DeSiervo"
+date: "4/29/2019"
+output: html_document
+---
+This is the code for calculating mosquito and beetle metrics from 2018 Greenland dataset. 
+
+First upload all the raw files
+
+```{r}

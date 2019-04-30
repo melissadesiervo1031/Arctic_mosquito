@@ -1,0 +1,12 @@
+---
+title: "Consumer resource predator"
+author: "Melissa DeSiervo"
+date: "4/29/2019"
+output: html_document
+---
+
+This is the code for relating mosquito population metrics with biofilm and beetles. 
+
+There are no raw files here, they are derived from the mosquito and biofilm metrics
+
+```{r}
