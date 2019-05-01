@@ -1,0 +1,78 @@
+---
+title: "Pond metrics"
+author: "Melissa DeSiervo"
+date: "5/1/2019"
+output: html_document
+---
+This is the code for calculating pond metrics from 2018 Greenland dataset. 
+
+First upload all the files.
+Some data are organized by pond (Temperature, Perimeter). 
+Other data are organized by sampling station within pond (YSI data, FPOM, Soluble nutrients)
+
+```{r Upload data and fix date formats}
+allpondmetricsbysamplingstation <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/1-Pond metrics/Inputs/allpondmetricsbysamplingstation.csv")
+
+allpondmetricsbysamplingstation$Date <- as.Date(allpondmetricsbysamplingstation$Date, "%m/%d/%Y")
+```
+
+Install necessary packages
+```{r Upload packages}
+install.packages("dplyr")
+library(dplyr)
+install.packages("lme4")
+library(lme4)
+```
+
+For the variables where I have sampling station within pond, summarize means and stdev by pond and date (Table 1)
+```{r summarize by pond }
+abioticsummarybypondanddate<-allpondmetricsbysamplingstation %>% group_by(Pond, Date) %>% dplyr::summarise(meanDepth=mean(Depth, na.rm=TRUE),sdDepth=sd(Depth, na.rm=TRUE), meanDOC=mean(DOC, na.rm=TRUE),sdDOC=sd(DOC, na.rm=TRUE), meanNH4=mean(NH4, na.rm=TRUE),sdNH4=sd(NH4, na.rm=TRUE), meanN03N02=mean(N03N02, na.rm=TRUE),sdN03N02=sd(N03N02, na.rm=TRUE), meanTotalP=mean(TotalP, na.rm=TRUE),sdTotalP=sd(TotalP, na.rm=TRUE),meanConduc=mean(Conduc, na.rm=TRUE),sdConduc=sd(Conduc, na.rm=TRUE), meanDoPerc=mean(DoPerc, na.rm=TRUE),sdDoPerc=sd(DoPerc, na.rm=TRUE), meanpH=mean(pH, na.rm=TRUE),sdpH=sd(pH, na.rm=TRUE), meanFPOM_liter=mean(FPOM_liter, na.rm=TRUE),sdFPOM_liter=sd(FPOM_liter, na.rm=TRUE))
+```
+
+Conduct a manova test for variables with variation within pond and between dates (Table S2)
+```{r manova test}
+manRes1 <- manova(cbind(FPOM_liter,DOC, NH4, N03N02, logTotalP, logConduc, DoPerc, pH, Depth) ~ Pond*Instar+Error(Sampling.station), data = allpondmetricsbysamplingstation, na.action=na.omit)
+summary(manRes1, tol=0)
+```
+
+Conduct seperate anovas for variables with bonferroni adjusment (Table S2)
+    bonferroni adjustment....a0.05=0.0056, a0.01=0.0011, a0.001=0.00011116
+```{r anovas bonferroni}
+Depthmodel<-lmer(Depth~Pond*Instar+(1|Pond:Sampling.station), data=allpondmetricsbysamplingstation, na.action=na.omit)
+DOCmodel<-lmer(DOC~Pond*Instar+(1|Pond:Sampling.station), data=allpondmetricsbysamplingstation, na.action=na.omit)
+NH4model<-lmer(NH4~Pond*Instar+(1|Pond:Sampling.station), data=allpondmetricsbysamplingstation, na.action=na.omit)
+N03N02model<-lmer(N03N02~Pond*Instar+(1|Pond:Sampling.station), data=allpondmetricsbysamplingstation, na.action=na.omit)
+TotalPmodel<-lmer(logTotalP~Pond*Instar+(1|Pond:Sampling.station), data=allpondmetricsbysamplingstation, na.action=na.omit)
+pHmodel<-lmer(pH~Pond*Instar+(1|Pond:Sampling.station), data=allpondmetricsbysamplingstation, na.action=na.omit)
+conductmodel<-lmer(logConduc~Pond*Instar+(1|Pond:Sampling.station), data=allpondmetricsbysamplingstation, na.action=na.omit)
+Domodel<-lmer(DoPerc~Pond*Instar+(1|Pond:Sampling.station), data=allpondmetricsbysamplingstation, na.action=na.omit)
+FPOMmodel<-lmer(FPOM_adjust~Pond*Instar+(1|Pond:Sampling.station), data=allpondmetricsbysamplingstation, na.action=na.omit)
+
+summary(Depthmodel)
+anova(Depthmodel)
+
+summary(DOCmodel)
+anova(DOCmodel)
+
+summary(NH4model)
+anova(NH4model)
+
+summary(N03N02model)
+anova(N03N02model)
+
+summary(TotalPmodel)
+anova(TotalPmodel)
+
+summary(pHmodel)
+anova(pHmodel)
+
+summary(conductmodel)
+anova(conductmodel)
+
+summary(Domodel)
+anova(Domodel)
+
+summary(FPOMmodel)
+anova(FPOMmodel)
+
+```
