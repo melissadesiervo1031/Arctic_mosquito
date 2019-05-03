@@ -43,7 +43,7 @@ library(tidyr)
 ```
 
 For the pond variables where I have sampling station within pond, summarize means and stdev by pond and date 
-```{r summarize by pond }
+```{r summarize by pond and date}
 abioticsummarybypondanddate<-allpondmetricsbysamplingstation %>% group_by(Pond, Date) %>% dplyr::summarise(meanDepth=mean(Depth, na.rm=TRUE),sdDepth=sd(Depth, na.rm=TRUE), meanDOC=mean(DOC, na.rm=TRUE),sdDOC=sd(DOC, na.rm=TRUE), meanNH4=mean(NH4, na.rm=TRUE),sdNH4=sd(NH4, na.rm=TRUE), meanN03N02=mean(N03N02, na.rm=TRUE),sdN03N02=sd(N03N02, na.rm=TRUE), meanTotalP=mean(TotalP, na.rm=TRUE),sdTotalP=sd(TotalP, na.rm=TRUE),meanConduc=mean(Conduc, na.rm=TRUE),sdConduc=sd(Conduc, na.rm=TRUE), meanDoPerc=mean(DoPerc, na.rm=TRUE),sdDoPerc=sd(DoPerc, na.rm=TRUE), meanpH=mean(pH, na.rm=TRUE),sdpH=sd(pH, na.rm=TRUE), meanFPOM_liter=mean(FPOM_liter, na.rm=TRUE),sdFPOM_liter=sd(FPOM_liter, na.rm=TRUE))
 ```
 
@@ -197,8 +197,56 @@ write.csv(abioticsummarybypondanddate5, "C:/Users/Mitzi/Dropbox/Mosquito Science
 
 ```
 
+Reorganize data to make correllations
+1)spread to wide format perimeter and area 
+2)Calculate average perimeter, area, and loss
+3)Calculate total average temp for each pond different than table 1
+4)Summarize other abiotic variables by pond (Use the log transformed version for total P and conductivity)
+5)Merge into final data table by pond
+6)get rid of some columns
+```{r correllations at pond level}
+#1
+perimeterwide<-perimeterarea %>% select(Pond,Measurement,Perimeter) %>% spread(Measurement,Perimeter)%>% rename(Perimeter_1=Beginning, Perimeter_2=End)
 
-```{r export Table 1}
+areawide<-perimeterarea %>% select(Pond,Measurement,Area) %>% spread(Measurement,Area)%>% rename(Area_1=Beginning, Area_2=End)
 
+perimandareawide<- perimeterwide %>% left_join(areawide, by=c("Pond"))
+
+#2
+perimandareawide2<-perimandareawide %>% mutate(Perim_avg=(Perimeter_1 + Perimeter_2)/2, Area_avg=(Area_1+Area_2)/2, Perim_loss=abs(Perimeter_2-Perimeter_1), Area_loss=abs(Area_2-Area_1))
+
+#3
+avgtempearlyinstartopupae <- tempandthermalsums %>% filter(Pond=="East" & Date>="2018-05-18" & Date<="2018-06-18"|
+  Pond=="Golf" & Date>="2018-05-19" & Date<="2018-06-11"|Pond=="Ice" & Date>="2018-05-20" & Date<="2018-06-12"|
+  Pond=="NoOil" & Date>="2018-05-15" & Date<="2018-06-04"|Pond=="Oil" & Date>="2018-05-09" & Date<="2018-06-05"|
+  Pond=="Vulgaris" & Date>="2018-05-17" & Date<="2018-06-13"|Pond=="Vulgaris.small" & Date>="2018-05-20" &     Date<="2018-06-13"|Pond=="Waterfall" & Date>="2018-05-16" & Date<="2018-06-11")
+
+avgtempbypond<- avgtempearlyinstartopupae%>% group_by(Pond)  %>% summarise(meantemp=mean(meantemp, na.rm=TRUE))
+
+#4
+abioticsummarybypondwithsd<-allpondmetricsbysamplingstation %>% group_by(Pond) %>% dplyr::summarise(meanDepth=mean(Depth, na.rm=TRUE),sdDepth=sd(Depth, na.rm=TRUE), meanDOC=mean(DOC, na.rm=TRUE),sdDOC=sd(DOC, na.rm=TRUE), meanNH4=mean(NH4, na.rm=TRUE),sdNH4=sd(NH4, na.rm=TRUE), meanN03N02=mean(N03N02, na.rm=TRUE),sdN03N02=sd(N03N02, na.rm=TRUE), meanlogTotalP=mean(logTotalP, na.rm=TRUE),sdTotalP=sd(TotalP, na.rm=TRUE),meanlogConduc=mean(logConduc, na.rm=TRUE),sdConduc=sd(Conduc, na.rm=TRUE), meanDoPerc=mean(DoPerc, na.rm=TRUE),sdDoPerc=sd(DoPerc, na.rm=TRUE), meanpH=mean(pH, na.rm=TRUE),sdpH=sd(pH, na.rm=TRUE), meanFPOM_liter=mean(FPOM_liter, na.rm=TRUE),sdFPOM_liter=sd(FPOM_liter, na.rm=TRUE))
+
+abioticsummarybypond<-allpondmetricsbysamplingstation %>% group_by(Pond) %>% dplyr::summarise(meanDepth=mean(Depth, na.rm=TRUE), meanDOC=mean(DOC, na.rm=TRUE), meanNH4=mean(NH4, na.rm=TRUE), meanN03N02=mean(N03N02, na.rm=TRUE), meanlogTotalP=mean(logTotalP, na.rm=TRUE),meanlogConduc=mean(logConduc, na.rm=TRUE), meanDoPerc=mean(DoPerc, na.rm=TRUE), meanpH=mean(pH, na.rm=TRUE),meanFPOM_liter=mean(FPOM_liter, na.rm=TRUE))
+
+#5
+abioticsummarybypond$Pond<-plyr::revalue(abioticsummarybypond$Pond, c("Vulgaris small"="Vulgaris.small"))
+abioticandperimarea<- abioticsummarybypond %>% left_join(perimandareawide2, by=c("Pond"))
+allabiotic<-abioticandperimarea %>% left_join(avgtempbypond, by=c("Pond"))
+
+#6
+allabiotic2 <- allabiotic[ -c(11:14,17)]
+allabiotic2<-allabiotic2[,c(1, 11:13,2,14,10,3:6,9,7,8)] #change order of columns#
+
+#7
+subsetpredicators<- allabiotic2[-1]
+correllationspondlevel<-correllations<-round(cor(subsetpredicators, use = "pairwise.complete.obs"),2)
+```
+
+Export table S2
+```{r export Table S21}
+
+write.csv(correllationspondlevel, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/tableS2.csv")
+
+```
 
 ```
