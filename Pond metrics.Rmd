@@ -9,11 +9,15 @@ This is the code for calculating pond metrics from 2018 Greenland dataset.
 First upload all the files.
 Some data are organized by pond (Temperature, Perimeter). 
 Other data are organized by sampling station within pond (YSI data, FPOM, Soluble nutrients)
+  They are from different raw data files
 
 ```{r Upload data and fix date formats}
-allpondmetricsbysamplingstation <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/1-Pond metrics/Inputs/allpondmetricsbysamplingstation.csv")
-
+allpondmetricsbysamplingstation <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/allpondmetricsbysamplingstation.csv")
 allpondmetricsbysamplingstation$Date <- as.Date(allpondmetricsbysamplingstation$Date, "%m/%d/%Y")
+
+Ponds2018Temp2<-read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/Allponds2018andairport_Temp.csv", header = TRUE)  # read csv file 
+Ponds2018Temp2$DateTime<-as.POSIXct(Ponds2018Temp2$DateTime, format = "%m/%d/%Y %H:%M") ##dateformatfordate_time_start##
+Ponds2018Temp2$Date <- as.Date(Ponds2018Temp2$Date, "%m/%d/%Y")
 ```
 
 Install necessary packages
@@ -22,9 +26,13 @@ install.packages("dplyr")
 library(dplyr)
 install.packages("lme4")
 library(lme4)
+install.packages("chillR")
+library(chillR)
+install.packages("tidyr")
+library(tidyr)
 ```
 
-For the variables where I have sampling station within pond, summarize means and stdev by pond and date (Table 1)
+For the variables where I have sampling station within pond, summarize means and stdev by pond and date 
 ```{r summarize by pond }
 abioticsummarybypondanddate<-allpondmetricsbysamplingstation %>% group_by(Pond, Date) %>% dplyr::summarise(meanDepth=mean(Depth, na.rm=TRUE),sdDepth=sd(Depth, na.rm=TRUE), meanDOC=mean(DOC, na.rm=TRUE),sdDOC=sd(DOC, na.rm=TRUE), meanNH4=mean(NH4, na.rm=TRUE),sdNH4=sd(NH4, na.rm=TRUE), meanN03N02=mean(N03N02, na.rm=TRUE),sdN03N02=sd(N03N02, na.rm=TRUE), meanTotalP=mean(TotalP, na.rm=TRUE),sdTotalP=sd(TotalP, na.rm=TRUE),meanConduc=mean(Conduc, na.rm=TRUE),sdConduc=sd(Conduc, na.rm=TRUE), meanDoPerc=mean(DoPerc, na.rm=TRUE),sdDoPerc=sd(DoPerc, na.rm=TRUE), meanpH=mean(pH, na.rm=TRUE),sdpH=sd(pH, na.rm=TRUE), meanFPOM_liter=mean(FPOM_liter, na.rm=TRUE),sdFPOM_liter=sd(FPOM_liter, na.rm=TRUE))
 ```
@@ -74,5 +82,96 @@ anova(Domodel)
 
 summary(FPOMmodel)
 anova(FPOMmodel)
+
+```
+
+Next, deal with the temperature (Hourly hobo logger data)
+1) First turn the data into long format
+2) Calculate average temperatures for each day
+3) Calculate degree hours with a base of 0, 1, 2, 3, 4, 5
+4) Add up each column by date and then divide by 24 to get daily thermal sums
+5) Then cumulation by date to get daily thermal sums
+6) merge dataframes
+7) pull out the relevant thermal sums
+
+```{r calculate thermal sums}
+#1
+Ponds2018Templong<- Ponds2018Temp2%>% gather(Oil, NoOil, East, Golf, Ice, Vulgaris, Vulgaris.small, Waterfall, Airport, key = "Pond", value = "TempC")
+Ponds2018Templong$Pond<-as.factor(Ponds2018Templong$Pond)
+
+#2
+avgdailytemp<-Ponds2018Templong %>% drop_na()  %>% group_by(Date, Pond) %>%dplyr::summarise(meantemp=mean(TempC,na.rm=TRUE),sdtemp=sd(TempC, na.rm=TRUE)) %>% arrange(Pond, Date)
+
+#3
+Degreehoursall2018<-Ponds2018Templong %>% drop_na() %>% mutate(GDD0=ifelse(TempC>0, TempC-0, 0), GDD1=ifelse(TempC>1, TempC-1, 0), GDD2=ifelse(TempC>2, TempC-2, 0), GDD3=ifelse(TempC>3, TempC-3, 0), GDD4=ifelse(TempC>4, TempC-4, 0), GDD5=ifelse(TempC>5, TempC-5, 0))
+
+#4
+Degreedaysall2018<-Degreehoursall2018 %>% group_by(Date, Pond) %>%dplyr::summarize(DegreeDay0=(sum(GDD0, na.rm=FALSE))/24, DegreeDay1=(sum(GDD1, na.rm=FALSE))/24, DegreeDay2=(sum(GDD2, na.rm=FALSE))/24, DegreeDay3=(sum(GDD3, na.rm=FALSE))/24, DegreeDay4=(sum(GDD4, na.rm=FALSE))/24, DegreeDay5=(sum(GDD5, na.rm=FALSE))/24) %>% arrange(Pond, Date = as.Date(Date, "%d-%m-%Y"))
+
+#5
+Thermalsumsall2018<-Degreedaysall2018  %>% group_by(Pond)%>% arrange(Pond, Date)%>% dplyr::mutate(TS0=cumsum(DegreeDay0),TS1=cumsum(DegreeDay1), TS2=cumsum(DegreeDay2), TS3=cumsum(DegreeDay3), TS4=cumsum(DegreeDay4), TS5=cumsum(DegreeDay5))
+
+#6
+tempandthermalsums <- avgdailytemp %>% right_join(Thermalsumsall2018, by=c("Date","Pond"))
+
+#7
+Ponddates<-abioticsummarybypondanddate %>% select(Pond, Date)
+Ponddates$Pond<-plyr::revalue(Ponddates$Pond, c("Vulgaris small"="Vulgaris.small"))
+thermalsumsatdates<-Ponddates %>% left_join(tempandthermalsums, by=c("Date","Pond"))%>% select(Pond, Date, TS0)%>% arrange(Pond, Date)
+```
+
+Next, pull out the relevant temperatures 
+1) Pull out the avg temp from the first day of sampling
+2) Pull out the dates in between sampling dates 1 and 2 and take average
+3) Pull out the dates in between sampling dates 2 and 3 and take average
+4) Merge the average temps
+```{r temp dates}
+
+#1
+tempfirstdateeachpond <-  tempandthermalsums%>% group_by(Pond) %>%  slice(which.min(Date))%>%  select(Date, Pond, meantemp)
+
+#2
+betweenfirstandsecond <- tempandthermalsums %>% filter(Pond=="East" & Date>="2018-05-18" & Date<="2018-06-01"|
+  Pond=="Golf" & Date>="2018-05-19" & Date<="2018-06-02"|Pond=="Ice" & Date>="2018-05-20" & Date<="2018-06-04"|
+  Pond=="NoOil" & Date>="2018-05-15" & Date<="2018-05-27"|Pond=="Oil" & Date>="2018-05-09" & Date<="2018-05-13"|
+  Pond=="Vulgaris" & Date>="2018-05-17" & Date<="2018-05-29"|Pond=="Vulgaris.small" & Date>="2018-05-20" & Date<="2018-06-04"|
+  Pond=="Waterfall" & Date>="2018-05-16" & Date<="2018-05-27")
+
+avgtempbetweenfirstandsecond<-betweenfirstandsecond  %>% group_by(Pond) %>%dplyr::summarize(avgtemp12=mean(meantemp), sdtemp12=sd(meantemp))
+
+#3
+betweensecondandthird <- tempandthermalsums %>% filter(Pond=="East" & Date>="2018-06-01" & Date<="2018-06-17"|
+  Pond=="Golf" & Date>="2018-06-02" & Date<="2018-06-11"|Pond=="Ice" & Date>="2018-06-04" & Date<="2018-06-12"|
+  Pond=="NoOil" & Date>="2018-05-27" & Date<="2018-06-04"|Pond=="Oil" & Date>="2018-05-13" & Date<="2018-06-05"|
+  Pond=="Vulgaris" & Date>="2018-05-29" & Date<="2018-06-13"|Pond=="Vulgaris.small" & Date>="2018-06-04" & Date<="2018-06-13"|
+  Pond=="Waterfall" & Date>="2018-05-27" & Date<="2018-06-11")
+
+avgtempbetweensecondandthird<-betweensecondandthird  %>% group_by(Pond) %>%dplyr::summarize(avgtemp23=mean(meantemp), sdtemp23=sd(meantemp))
+
+#4
+firstandfirstsecond <- tempfirstdateeachpond %>% right_join(avgtempbetweenfirstandsecond, by=c("Pond"))%>% select(Pond, meantemp, avgtemp12)
+allavgtemps<-firstandfirstsecond  %>% right_join(avgtempbetweensecondandthird, by=c("Pond"))%>% select(Pond, meantemp, avgtemp12, avgtemp23)
+
+#5
+avgtempsatsamplingdates<- allavgtemps%>% gather(meantemp, avgtemp12, avgtemp23, key = "Samplingperiod", value = "AvgTempC")%>% arrange(Pond)
+avgtempsatsamplingdates$Samplingperiod<-plyr::revalue(avgtempsatsamplingdates$Samplingperiod, c("meantemp"=1, "avgtemp12"=2, "avgtemp23"=3))
+
+```
+
+Add temperature and thermal sum data to the Pond X date dataframe
+
+This is what makes Table 1 in the manuscript!
+
+```{r merge temp with other abiotic variables}
+
+abioticsummarybypondanddate<-abioticsummarybypondanddate %>% arrange(Pond, Date)
+avgtempsatsamplingdates<-avgtempsatsamplingdates %>% arrange(Pond, Samplingperiod)
+
+abioticsummarybypondanddate2<-data.frame(abioticsummarybypondanddate,avgtempsatsamplingdates$AvgTempC )
+abioticsummarybypondanddate2 <- abioticsummarybypondanddate2 %>% dplyr::rename(AvgTemp=avgtempsatsamplingdates.AvgTempC)
+
+abioticsummarybypondanddate2$Pond<-plyr::revalue(abioticsummarybypondanddate2$Pond, c("Vulgaris small"="Vulgaris.small"))
+
+abioticsummarybypondanddate3<- abioticsummarybypondanddate2 %>% left_join(thermalsumsatdates, by=c("Pond", "Date"))
 
 ```
