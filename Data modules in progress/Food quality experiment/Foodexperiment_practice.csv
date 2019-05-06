@@ -1,0 +1,129 @@
+Number,Pond,Treatment,startdate,datedead,datepupae,dateemerged,finalstage,finalstage2,dayspup,daysalive,daysemerg,Winglength2,mag,Winglenth
+1,Ice,FPOM1,23-May,27-Jun,,,3rdinstar,3,,35,,,,
+2,Ice,FPOM1,23-May,11-Jun,,,3rdinstar,3,,19,,,,
+3,Ice,FPOM1,23-May,11-Jun,,,2ndinstar,2,,19,,,,
+4,Ice,FPOM1,23-May,4-Jul,,,4thinstar,4,,42,,,,
+5,Ice,FPOM1,23-May,17-Jul,,,3rdinstar,3,,55,,,,
+6,Ice,FPOM1,23-May,3-Jun,,,3rdinstar,3,,11,,,,
+7,Ice,FPOM1,23-May,4-Jul,,,4thinstar,4,,42,,,,
+8,Ice,FPOM1,23-May,4-Jul,,,3rdinstar,3,,42,,,,
+9,Ice,DET1,23-May,,11-Jun,15-Jun,Adult,6,19,,23,51,12,4.25
+10,Ice,DET1,23-May,11-Jun,,,larvae,,,19,,,,
+11,Ice,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,55,12,4.583333333
+12,Ice,DET1,23-May,,11-Jun,15-Jun,Adult,6,19,,23,58,12,4.833333333
+13,Ice,DET1,23-May,,11-Jun,15-Jun,Adult,6,19,,23,60,12,5
+14,Ice,DET1,23-May,,11-Jun,19-Jun,Adult,6,19,,27,59,12,4.916666667
+15,Ice,DET1,23-May,,7-Jun,11-Jun,Adult,6,15,,19,50,12,4.166666667
+16,Ice,DET1,23-May,,11-Jun,19-Jun,Adult,6,19,,27,55,12,4.583333333
+25,Vulgaris small,FPOM1,23-May,19-Jun,,,4thinstar,4,,27,,,,
+26,Vulgaris small,FPOM1,23-May,15-Jun,,,4thinstar,4,,23,,,,
+27,Vulgaris small,FPOM1,23-May,,7-Jun,11-Jun,Adult,6,15,,19,40,12,3.333333333
+28,Vulgaris small,FPOM1,23-May,15-Jun,,,4thinstar,4,,23,,,,
+29,Vulgaris small,FPOM1,23-May,27-Jun,,,3rdinstar,3,,35,,,,
+30,Vulgaris small,FPOM1,23-May,26-May,,,2ndinstar,2,,3,,,,
+31,Vulgaris small,FPOM1,23-May,15-Jun,,,4thinstar,4,,23,,,,
+32,Vulgaris small,FPOM1,23-May,19-Jun,,,3rdinstar,3,,27,,,,
+33,Vulgaris small,DET1,23-May,,7-Jun,11-Jun,Adult,6,15,,19,57,12,4.75
+34,Vulgaris small,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,62,12,5.166666667
+35,Vulgaris small,DET1,23-May,,7-Jun,11-Jun,Adult,6,15,,19,59,12,4.916666667
+36,Vulgaris small,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,70,12,5.833333333
+37,Vulgaris small,DET1,23-May,,11-Jun,15-Jun,Adult,6,19,,23,65,12,5.416666667
+38,Vulgaris small,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,60,12,5
+39,Vulgaris small,DET1,23-May,,7-Jun,11-Jun,Adult,6,15,,19,57,12,4.75
+40,Vulgaris small,DET1,23-May,,7-Jun,11-Jun,Adult,6,15,,19,52,12,4.333333333
+49,Vulgaris,FPOM1,23-May,23-Jun,15-Jun,,Pupae,5,23,31,,,,
+50,Vulgaris,FPOM1,23-May,19-Jun,,,3rdinstar,3,,27,,,,
+51,Vulgaris,FPOM1,23-May,19-Jun,,,4thinstar,4,,27,,,,
+52,Vulgaris,FPOM1,23-May,11-Jun,,,4thinstar,4,,19,,,,
+53,Vulgaris,FPOM1,23-May,23-Jun,,,3rdinstar,3,,31,,,,
+54,Vulgaris,FPOM1,23-May,23-Jun,,,3rdinstar,3,,31,,,,
+55,Vulgaris,FPOM1,23-May,7-Jun,,,3rdinstar,3,,15,,,,
+56,Vulgaris,FPOM1,23-May,19-Jun,,,3rdinstar,3,,27,,,,
+57,Vulgaris,DET1,23-May,,11-Jun,19-Jun,Adult,6,19,,27,59,12,4.916666667
+58,Vulgaris,DET1,23-May,26-May,,,2ndinstar,2,,3,,,,
+59,Vulgaris,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,65,12,5.416666667
+60,Vulgaris,DET1,23-May,,7-Jun,11-Jun,Adult,6,15,,19,59,,
+61,Vulgaris,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,55,12,4.583333333
+62,Vulgaris,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,,,
+63,Vulgaris,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,60,12,5
+64,Vulgaris,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,,,
+73,Waterfall,FPOM1,23-May,3-Jun,,,2ndinstar,2,,11,,,,
+74,Waterfall,FPOM1,23-May,7-Jun,,,3rdinstar,3,,15,,,,
+75,Waterfall,FPOM1,23-May,7-Jun,,,4thinstar,4,,15,,,,
+76,Waterfall,FPOM1,23-May,23-Jun,,,4thinstar,4,,31,,,,
+77,Waterfall,FPOM1,23-May,27-Jun,,,2ndinstar,2,,35,,,,
+78,Waterfall,FPOM1,23-May,3-Jun,,,3rdinstar,3,,11,,,,
+79,Waterfall,FPOM1,23-May,7-Jun,,,4thinstar,4,,15,,,,
+80,Waterfall,FPOM1,23-May,23-Jun,,,4thinstar,4,,31,,,,
+81,Waterfall,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,53,12,4.416666667
+82,Waterfall,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,50,,
+83,Waterfall,DET1,23-May,,11-Jun,15-Jun,Adult,6,19,,23,50,12,4.166666667
+84,Waterfall,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,50,12,4.166666667
+85,Waterfall,DET1,23-May,26-May,,,1stinstar,1,,3,,,,
+86,Waterfall,DET1,23-May,,11-Jun,19-Jun,Adult,6,19,,27,52,12,4.333333333
+87,Waterfall,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,,,
+88,Waterfall,DET1,23-May,,15-Jun,19-Jun,Adult,6,23,,27,56,12,
+97,Golf,FPOM1,23-May,15-Jun,,,3rdinstar,3,,23,,,,
+98,Golf,FPOM1,23-May,15-Jun,,,3rdinstar,3,,23,,,,
+99,Golf,FPOM1,23-May,7-Jun,,,3rdinstar,3,,15,,,,
+100,Golf,FPOM1,23-May,3-Jun,,,3rdinstar,3,,11,,,,
+101,Golf,FPOM1,23-May,7-Jun,,,3rdinstar,3,,15,,,,
+102,Golf,FPOM1,23-May,7-Jun,,,2ndinstar,2,,15,,,,
+103,Golf,FPOM1,23-May,7-Jun,,,3rdinstar,3,,15,,,,
+104,Golf,FPOM1,23-May,7-Jun,,,3rdinstar,3,,15,,,,
+105,Golf,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,46,12,3.833333333
+106,Golf,DET1,23-May,,11-Jun,19-Jun,Adult,6,19,,27,48,12,4
+107,Golf,DET1,23-May,19-Jun,,,larvae,,,27,,,,
+108,Golf,DET1,23-May,,15-Jun,23-Jun,Adult,6,23,,31,43,12,3.583333333
+109,Golf,DET1,23-May,,15-Jun,23-Jun,Adult,6,23,,31,51,12,4.25
+110,Golf,DET1,23-May,,15-Jun,23-Jun,Adult,6,23,,31,52,12,4.333333333
+111,Golf,DET1,23-May,,15-Jun,23-Jun,Adult,6,23,,31,48,12,4
+112,Golf,DET1,23-May,,11-Jun,15-Jun,Adult,6,19,,23,42,12,3.5
+121,Oil,FPOM1,23-May,15-Jun,,,4thinstar,4,,23,,,,
+122,Oil,FPOM1,23-May,3-Jun,,,3rdinstar,3,,11,,,,
+123,Oil,FPOM1,23-May,27-Jun,,,4thinstar,4,,35,,,,
+124,Oil,FPOM1,23-May,7-Jun,,,4thinstar,4,,15,,,,
+125,Oil,FPOM1,23-May,27-Jun,,,3rdinstar,3,,35,,,,
+126,Oil,FPOM1,23-May,15-Jun,,,3rdinstar,3,,23,,,,
+127,Oil,FPOM1,23-May,19-Jun,,,4thinstar,4,,27,,,,
+128,Oil,FPOM1,23-May,26-May,,,1stinstar,1,,3,,,,
+129,Oil,DET1,23-May,,11-Jun,15-Jun,Adult,6,19,,23,,,
+130,Oil,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,60,12,5
+131,Oil,DET1,23-May,,11-Jun,19-Jun,Adult,6,19,,27,55,12,4.583333333
+132,Oil,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,52,12,4.333333333
+133,Oil,DET1,23-May,,11-Jun,15-Jun,Adult,6,19,,23,48,12,4
+134,Oil,DET1,23-May,11-Jun,,,larvae,,,19,,,,
+135,Oil,DET1,23-May,11-Jun,,,larvae,,,19,,,,
+136,Oil,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,52,12,4.333333333
+145,No Oil,FPOM1,23-May,4-Jul,,,4thinstar,4,,42,,,,
+146,No Oil,FPOM1,23-May,7-Jun,,,4thinstar,4,,15,,,,
+147,No Oil,FPOM1,23-May,23-Jun,,,4thinstar,4,,31,,,,
+148,No Oil,FPOM1,23-May,4-Jul,,,4thinstar,4,,42,,,,
+149,No Oil,FPOM1,23-May,19-Jun,,,4thinstar,4,,27,,,,
+150,No Oil,FPOM1,23-May,3-Jun,,,3rdinstar,3,,11,,,,
+151,No Oil,FPOM1,23-May,7-Jun,,,3rdinstar,3,,15,,,,
+152,No Oil,FPOM1,23-May,4-Jul,,,4thinstar,4,,42,,,,
+153,No Oil,DET1,23-May,,11-Jun,15-Jun,Adult,6,19,,23,55,12,4.583333333
+154,No Oil,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,56,12,4.666666667
+155,No Oil,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,58,12,4.833333333
+156,No Oil,DET1,23-May,,7-Jun,11-Jun,Adult,6,15,,19,54,12,4.5
+157,No Oil,DET1,23-May,,11-Jun,15-Jun,Adult,6,19,,23,60,12,5
+158,No Oil,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,59,12,4.916666667
+159,No Oil,DET1,23-May,,11-Jun,19-Jun,Adult,6,19,,27,58,12,4.833333333
+160,No Oil,DET1,23-May,11-Jun,,,larvae,,,19,,,,
+169,East,FPOM1,23-May,15-Jun,,,4thinstar,4,,23,,,,
+170,East,FPOM1,23-May,15-Jun,,,4thinstar,4,,23,,,,
+171,East,FPOM1,23-May,7-Jun,,,4thinstar,4,,15,,,,
+172,East,FPOM1,23-May,7-Jun,,,4thinstar,4,,15,,,,
+173,East,FPOM1,23-May,7-Jun,,,3rdinstar,3,,15,,,,
+174,East,FPOM1,23-May,19-Jun,,,4thinstar,4,,27,,,,
+175,East,FPOM1,23-May,11-Jun,,,4thinstar,4,,19,,,,
+176,East,FPOM1,23-May,11-Jun,,,4thinstar,4,,19,,,,
+177,East,DET1,23-May,,11-Jun,19-Jun,Adult,6,19,,27,54,12,4.5
+178,East,DET1,23-May,,11-Jun,19-Jun,Adult,6,19,,27,55,12,4.583333333
+179,East,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,,,
+180,East,DET1,23-May,11-Jun,,,larvae,,,19,,,,
+181,East,DET1,23-May,15-Jun,11-Jun,,Pupae,5,19,23,,,,
+182,East,DET1,23-May,,11-Jun,19-Jun,Adult,6,19,,27,,,
+183,East,DET1,23-May,,7-Jun,15-Jun,Adult,6,15,,23,56,12,4.666666667
+184,East,DET1,23-May,,,,,,,,,,,
