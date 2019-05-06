@@ -130,6 +130,16 @@ Ponddates$Pond<-plyr::revalue(Ponddates$Pond, c("Vulgaris small"="Vulgaris.small
 thermalsumsatdates<-Ponddates %>% left_join(tempandthermalsums, by=c("Date","Pond"))%>% select(Pond, Date, TS0)%>% arrange(Pond, Date)
 ```
 
+export the temp and thermal sums for all dates
+
+```{r export tempthermalsum}
+
+write.csv(tempandthermalsums, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/watertempthermalsums.csv")
+
+```
+
+
+
 Next, pull out the relevant temperatures 
 1) Pull out the avg temp from the first day of sampling
 2) Pull out the dates in between sampling dates 1 and 2 and take average
@@ -167,6 +177,8 @@ avgtempsatsamplingdates<- allavgtemps%>% gather(meantemp, avgtemp12, avgtemp23, 
 avgtempsatsamplingdates$Samplingperiod<-plyr::revalue(avgtempsatsamplingdates$Samplingperiod, c("meantemp"=1, "avgtemp12"=2, "avgtemp23"=3))
 
 ```
+
+
 
 Add temperature and thermal sum data to the Pond X date dataframe
 
