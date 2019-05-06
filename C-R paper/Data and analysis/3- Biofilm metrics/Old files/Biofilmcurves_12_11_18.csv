@@ -1,0 +1,145 @@
+Pond,Sampling Station,Type,Type1,Type2,Date,Biofilm
+East,N,Cage,Beginning,Same,17-May,0
+East,NW,Cage,Beginning,Same,17-May,0
+East,S,Cage,Beginning,Same,17-May,0
+East,N,Cage,End,Cage,26-Jun,17.6385
+East,NW,Cage,End,Cage,26-Jun,15.1305
+East,S,Cage,End,Cage,26-Jun,22.044
+East,N,Cage,Middle,Same,1-Jun,8.675333333
+East,NW,Cage,Middle,Same,1-Jun,11.088
+East,S,Cage,Middle,Same,1-Jun,11.55266667
+East,N,NoCage,Beginning,Same,17-May,0
+East,NW,NoCage,Beginning,Same,17-May,0
+East,S,NoCage,Beginning,Same,17-May,0
+East,N,NoCage,End,NoCage,26-Jun,13.9755
+East,NW,NoCage,End,NoCage,26-Jun,7.161
+East,S,NoCage,End,NoCage,26-Jun,7.6209375
+East,N,NoCage,Middle,Same,1-Jun,8.675333333
+East,NW,NoCage,Middle,Same,1-Jun,11.088
+East,S,NoCage,Middle,Same,1-Jun,11.55266667
+Golf,Center,Cage,Beginning,Same,19-May,0
+Golf,N,Cage,Beginning,Same,19-May,0
+Golf,S,Cage,Beginning,Same,19-May,0
+Golf,Center,Cage,End,Cage,18-Jun,10.868
+Golf,N,Cage,End,Cage,18-Jun,18.194
+Golf,S,Cage,End,Cage,18-Jun,16.478
+Golf,Center,Cage,Middle,Same,2-Jun,11.69071429
+Golf,N,Cage,Middle,Same,2-Jun,2.73
+Golf,S,Cage,Middle,Same,2-Jun,5.794285714
+Golf,Center,NoCage,Beginning,Same,19-May,0
+Golf,N,NoCage,Beginning,Same,19-May,0
+Golf,S,NoCage,Beginning,Same,19-May,0
+Golf,Center,NoCage,End,NoCage,18-Jun,4.08375
+Golf,N,NoCage,End,NoCage,18-Jun,24.508
+Golf,S,NoCage,End,NoCage,18-Jun,4.928
+Golf,Center,NoCage,Middle,Same,2-Jun,11.69071429
+Golf,N,NoCage,Middle,Same,2-Jun,2.73
+Golf,S,NoCage,Middle,Same,2-Jun,5.794285714
+Ice,East,Cage,Beginning,Same,20-May,0
+Ice,NW,Cage,Beginning,Same,20-May,0
+Ice,S,Cage,Beginning,Same,20-May,0
+Ice,East,Cage,End,Cage,21-Jun,11.488125
+Ice,NW,Cage,End,Cage,21-Jun,5.02734375
+Ice,S,Cage,End,Cage,21-Jun,34.175625
+Ice,East,Cage,Middle,Same,4-Jun,
+Ice,NW,Cage,Middle,Same,4-Jun,3.362666667
+Ice,S,Cage,Middle,Same,4-Jun,7.002666667
+Ice,East,NoCage,Beginning,Same,20-May,0
+Ice,NW,NoCage,Beginning,Same,20-May,0
+Ice,S,NoCage,Beginning,Same,20-May,0
+Ice,East,NoCage,End,NoCage,21-Jun,11.34375
+Ice,NW,NoCage,End,NoCage,21-Jun,7.70859375
+Ice,S,NoCage,End,NoCage,21-Jun,
+Ice,East,NoCage,Middle,Same,4-Jun,
+Ice,NW,NoCage,Middle,Same,4-Jun,3.362666667
+Ice,S,NoCage,Middle,Same,4-Jun,7.002666667
+NoOil,NE,Cage,Beginning,Same,15-May,0
+NoOil,NW,Cage,Beginning,Same,15-May,0
+NoOil,SW,Cage,Beginning,Same,15-May,0
+NoOil,NE,Cage,End,Cage,14-Jun,5.8025
+NoOil,NW,Cage,End,Cage,14-Jun,10.46375
+NoOil,SW,Cage,End,Cage,14-Jun,17.655
+NoOil,NE,Cage,Middle,Same,27-May,3.715833333
+NoOil,NW,Cage,Middle,Same,27-May,18.135
+NoOil,SW,Cage,Middle,Same,27-May,
+NoOil,NE,NoCage,Beginning,Same,15-May,0
+NoOil,NW,NoCage,Beginning,Same,15-May,0
+NoOil,SW,NoCage,Beginning,Same,15-May,0
+NoOil,NE,NoCage,End,NoCage,14-Jun,6.20125
+NoOil,NW,NoCage,End,NoCage,14-Jun,8.371
+NoOil,SW,NoCage,End,NoCage,14-Jun,6.47625
+NoOil,NE,NoCage,Middle,Same,27-May,3.715833333
+NoOil,NW,NoCage,Middle,Same,27-May,18.135
+NoOil,SW,NoCage,Middle,Same,27-May,
+Oil,Center,Cage,Beginning,Same,9-May,0
+Oil,East,Cage,Beginning,Same,9-May,0
+Oil,West,Cage,Beginning,Same,9-May,0
+Oil,Center,Cage,End,Cage,14-Jun,9.223958333
+Oil,East,Cage,End,Cage,14-Jun,7.690833333
+Oil,West,Cage,End,Cage,14-Jun,13.715625
+Oil,Center,Cage,Middle,Same,19-May,8.47808642
+Oil,East,Cage,Middle,Same,19-May,7.06875
+Oil,West,Cage,Middle,Same,19-May,6.355555556
+Oil,Center,NoCage,Beginning,Same,9-May,0
+Oil,East,NoCage,Beginning,Same,9-May,0
+Oil,West,NoCage,Beginning,Same,9-May,0
+Oil,Center,NoCage,End,NoCage,14-Jun,5.243333333
+Oil,East,NoCage,End,NoCage,14-Jun,3.6025
+Oil,West,NoCage,End,NoCage,14-Jun,2.695
+Oil,Center,NoCage,Middle,Same,19-May,8.47808642
+Oil,East,NoCage,Middle,Same,19-May,7.06875
+Oil,West,NoCage,Middle,Same,19-May,6.355555556
+Vulgaris,East,Cage,Beginning,Same,17-May,0
+Vulgaris,NE,Cage,Beginning,Same,17-May,0
+Vulgaris,NW,Cage,Beginning,Same,17-May,0
+Vulgaris,East,Cage,End,Cage,21-Jun,56.55375
+Vulgaris,NE,Cage,End,Cage,21-Jun,48.38625
+Vulgaris,NW,Cage,End,Cage,21-Jun,31.865625
+Vulgaris,East,Cage,Middle,Same,29-May,10.22666667
+Vulgaris,NE,Cage,Middle,Same,29-May,11.659375
+Vulgaris,NW,Cage,Middle,Same,29-May,9.836666667
+Vulgaris,East,NoCage,Beginning,Same,17-May,0
+Vulgaris,NE,NoCage,Beginning,Same,17-May,0
+Vulgaris,NW,NoCage,Beginning,Same,17-May,0
+Vulgaris,East,NoCage,End,NoCage,21-Jun,26.07
+Vulgaris,NE,NoCage,End,NoCage,21-Jun,16.066875
+Vulgaris,NW,NoCage,End,NoCage,21-Jun,48.076875
+Vulgaris,East,NoCage,Middle,Same,29-May,10.22666667
+Vulgaris,NE,NoCage,Middle,Same,29-May,11.659375
+Vulgaris,NW,NoCage,Middle,Same,29-May,9.836666667
+Vulgaris small,East,Cage,Beginning,Same,20-May,0
+Vulgaris small,NE,Cage,Beginning,Same,20-May,0
+Vulgaris small,S,Cage,Beginning,Same,20-May,0
+Vulgaris small,East,Cage,End,Cage,24-Jun,23.232
+Vulgaris small,NE,Cage,End,Cage,24-Jun,45.276
+Vulgaris small,S,Cage,End,Cage,24-Jun,25.68342857
+Vulgaris small,East,Cage,Middle,Same,4-Jun,5.087333333
+Vulgaris small,NE,Cage,Middle,Same,4-Jun,4.316
+Vulgaris small,S,Cage,Middle,Same,4-Jun,4.255333333
+Vulgaris small,East,NoCage,Beginning,Same,20-May,0
+Vulgaris small,NE,NoCage,Beginning,Same,20-May,0
+Vulgaris small,S,NoCage,Beginning,Same,20-May,0
+Vulgaris small,East,NoCage,End,NoCage,24-Jun,20.15828571
+Vulgaris small,NE,NoCage,End,NoCage,24-Jun,10.24178571
+Vulgaris small,S,NoCage,End,NoCage,24-Jun,9.805714286
+Vulgaris small,East,NoCage,Middle,Same,4-Jun,5.087333333
+Vulgaris small,NE,NoCage,Middle,Same,4-Jun,4.316
+Vulgaris small,S,NoCage,Middle,Same,4-Jun,4.255333333
+Waterfall,NE,Cage,Beginning,Same,16-May,0
+Waterfall,NW,Cage,Beginning,Same,16-May,0
+Waterfall,South,Cage,Beginning,Same,16-May,0
+Waterfall,NE,Cage,End,Cage,18-Jun,23.64
+Waterfall,NW,Cage,End,Cage,18-Jun,11.3625
+Waterfall,South,Cage,End,Cage,18-Jun,13.175
+Waterfall,NE,Cage,Middle,Same,28-May,1.3
+Waterfall,NW,Cage,Middle,Same,28-May,2.245454545
+Waterfall,South,Cage,Middle,Same,28-May,1.063636364
+Waterfall,NE,NoCage,Beginning,Same,16-May,0
+Waterfall,NW,NoCage,Beginning,Same,16-May,0
+Waterfall,South,NoCage,Beginning,Same,16-May,0
+Waterfall,NE,NoCage,End,NoCage,18-Jun,5.41
+Waterfall,NW,NoCage,End,NoCage,18-Jun,6.625
+Waterfall,South,NoCage,End,NoCage,18-Jun,10.45
+Waterfall,NE,NoCage,Middle,Same,28-May,1.3
+Waterfall,NW,NoCage,Middle,Same,28-May,2.245454545
+Waterfall,South,NoCage,Middle,Same,28-May,1.063636364

@@ -1,0 +1,145 @@
+Pond,Sampling Station,Type,Type1,Date,Biofilm
+East,N,NoCage,Beginning,17-May,0
+East,NW,NoCage,Beginning,17-May,0
+East,S,NoCage,Beginning,17-May,0
+East,N,NoCage,Treatment,1-Jun,8.675333333
+East,NW,NoCage,Treatment,1-Jun,11.088
+East,S,NoCage,Treatment,1-Jun,11.55266667
+East,N,NoCage,No Cage,26-Jun,13.9755
+East,NW,NoCage,No Cage,26-Jun,7.161
+East,S,NoCage,No Cage,26-Jun,7.6209375
+Golf,Center,NoCage,Beginning,19-May,0
+Golf,N,NoCage,Beginning,19-May,0
+Golf,S,NoCage,Beginning,19-May,0
+Golf,Center,NoCage,Treatment,2-Jun,11.69071429
+Golf,N,NoCage,Treatment,2-Jun,2.73
+Golf,S,NoCage,Treatment,2-Jun,5.794285714
+Golf,Center,NoCage,No Cage,18-Jun,4.08375
+Golf,N,NoCage,No Cage,18-Jun,24.508
+Golf,S,NoCage,No Cage,18-Jun,4.928
+Ice,East,NoCage,Beginning,20-May,0
+Ice,NW,NoCage,Beginning,20-May,0
+Ice,S,NoCage,Beginning,20-May,0
+Ice,East,NoCage,Treatment,4-Jun,
+Ice,NW,NoCage,Treatment,4-Jun,3.362666667
+Ice,S,NoCage,Treatment,4-Jun,7.002666667
+Ice,East,NoCage,No Cage,21-Jun,11.34375
+Ice,NW,NoCage,No Cage,21-Jun,7.70859375
+Ice,S,NoCage,No Cage,21-Jun,
+NoOil,NE,NoCage,Beginning,15-May,0
+NoOil,NW,NoCage,Beginning,15-May,0
+NoOil,SW,NoCage,Beginning,15-May,0
+NoOil,NE,NoCage,Treatment,27-May,3.715833333
+NoOil,NW,NoCage,Treatment,27-May,18.135
+NoOil,SW,NoCage,Treatment,27-May,
+NoOil,NE,NoCage,No Cage,14-Jun,6.20125
+NoOil,NW,NoCage,No Cage,14-Jun,8.371
+NoOil,SW,NoCage,No Cage,14-Jun,6.47625
+Oil,Center,NoCage,Beginning,9-May,0
+Oil,East,NoCage,Beginning,9-May,0
+Oil,West,NoCage,Beginning,9-May,0
+Oil,Center,NoCage,Treatment,19-May,8.47808642
+Oil,East,NoCage,Treatment,19-May,7.06875
+Oil,West,NoCage,Treatment,19-May,6.355555556
+Oil,Center,NoCage,No Cage,14-Jun,5.243333333
+Oil,East,NoCage,No Cage,14-Jun,3.6025
+Oil,West,NoCage,No Cage,14-Jun,2.695
+Vulgaris,East,NoCage,Beginning,17-May,0
+Vulgaris,NE,NoCage,Beginning,17-May,0
+Vulgaris,NW,NoCage,Beginning,17-May,0
+Vulgaris,East,NoCage,Treatment,29-May,10.22666667
+Vulgaris,NE,NoCage,Treatment,29-May,11.659375
+Vulgaris,NW,NoCage,Treatment,29-May,9.836666667
+Vulgaris,East,NoCage,No Cage,21-Jun,26.07
+Vulgaris,NE,NoCage,No Cage,21-Jun,16.066875
+Vulgaris,NW,NoCage,No Cage,21-Jun,48.076875
+Vulgaris small,East,NoCage,Beginning,20-May,0
+Vulgaris small,NE,NoCage,Beginning,20-May,0
+Vulgaris small,S,NoCage,Beginning,20-May,0
+Vulgaris small,East,NoCage,Treatment,4-Jun,5.087333333
+Vulgaris small,NE,NoCage,Treatment,4-Jun,4.316
+Vulgaris small,S,NoCage,Treatment,4-Jun,4.255333333
+Vulgaris small,East,NoCage,No Cage,24-Jun,20.15828571
+Vulgaris small,NE,NoCage,No Cage,24-Jun,10.24178571
+Vulgaris small,S,NoCage,No Cage,24-Jun,9.805714286
+Waterfall,NE,NoCage,Beginning,16-May,0
+Waterfall,NW,NoCage,Beginning,16-May,0
+Waterfall,South,NoCage,Beginning,16-May,0
+Waterfall,NE,NoCage,Treatment,28-May,1.3
+Waterfall,NW,NoCage,Treatment,28-May,2.245454545
+Waterfall,South,NoCage,Treatment,28-May,1.063636364
+Waterfall,NE,NoCage,No Cage,18-Jun,5.41
+Waterfall,NW,NoCage,No Cage,18-Jun,6.625
+Waterfall,South,NoCage,No Cage,18-Jun,10.45
+East,N,Cage,Beginning,17-May,0
+East,NW,Cage,Beginning,17-May,0
+East,S,Cage,Beginning,17-May,0
+East,N,Cage,Treatment,1-Jun,8.675333333
+East,NW,Cage,Treatment,1-Jun,11.088
+East,S,Cage,Treatment,1-Jun,11.55266667
+East,N,Cage,Cage,26-Jun,17.6385
+East,NW,Cage,Cage,26-Jun,15.1305
+East,S,Cage,Cage,26-Jun,22.044
+Golf,Center,Cage,Beginning,19-May,0
+Golf,N,Cage,Beginning,19-May,0
+Golf,S,Cage,Beginning,19-May,0
+Golf,Center,Cage,Treatment,2-Jun,11.69071429
+Golf,N,Cage,Treatment,2-Jun,2.73
+Golf,S,Cage,Treatment,2-Jun,5.794285714
+Golf,Center,Cage,Cage,18-Jun,10.868
+Golf,N,Cage,Cage,18-Jun,18.194
+Golf,S,Cage,Cage,18-Jun,16.478
+Ice,East,Cage,Beginning,20-May,0
+Ice,NW,Cage,Beginning,20-May,0
+Ice,S,Cage,Beginning,20-May,0
+Ice,East,Cage,Treatment,4-Jun,
+Ice,NW,Cage,Treatment,4-Jun,3.362666667
+Ice,S,Cage,Treatment,4-Jun,7.002666667
+Ice,East,Cage,Cage,21-Jun,11.488125
+Ice,NW,Cage,Cage,21-Jun,5.02734375
+Ice,S,Cage,Cage,21-Jun,34.175625
+NoOil,NE,Cage,Beginning,15-May,0
+NoOil,NW,Cage,Beginning,15-May,0
+NoOil,SW,Cage,Beginning,15-May,0
+NoOil,NE,Cage,Treatment,27-May,3.715833333
+NoOil,NW,Cage,Treatment,27-May,18.135
+NoOil,SW,Cage,Treatment,27-May,
+NoOil,NE,Cage,Cage,14-Jun,5.8025
+NoOil,NW,Cage,Cage,14-Jun,10.46375
+NoOil,SW,Cage,Cage,14-Jun,17.655
+Oil,Center,Cage,Beginning,9-May,0
+Oil,East,Cage,Beginning,9-May,0
+Oil,West,Cage,Beginning,9-May,0
+Oil,Center,Cage,Treatment,19-May,8.47808642
+Oil,East,Cage,Treatment,19-May,7.06875
+Oil,West,Cage,Treatment,19-May,6.355555556
+Oil,Center,Cage,Cage,14-Jun,9.223958333
+Oil,East,Cage,Cage,14-Jun,7.690833333
+Oil,West,Cage,Cage,14-Jun,13.715625
+Vulgaris,East,Cage,Beginning,17-May,0
+Vulgaris,NE,Cage,Beginning,17-May,0
+Vulgaris,NW,Cage,Beginning,17-May,0
+Vulgaris,East,Cage,Treatment,29-May,10.22666667
+Vulgaris,NE,Cage,Treatment,29-May,11.659375
+Vulgaris,NW,Cage,Treatment,29-May,9.836666667
+Vulgaris,East,Cage,Cage,21-Jun,56.55375
+Vulgaris,NE,Cage,Cage,21-Jun,48.38625
+Vulgaris,NW,Cage,Cage,21-Jun,31.865625
+Vulgaris small,East,Cage,Beginning,20-May,0
+Vulgaris small,NE,Cage,Beginning,20-May,0
+Vulgaris small,S,Cage,Beginning,20-May,0
+Vulgaris small,East,Cage,Treatment,4-Jun,5.087333333
+Vulgaris small,NE,Cage,Treatment,4-Jun,4.316
+Vulgaris small,S,Cage,Treatment,4-Jun,4.255333333
+Vulgaris small,East,Cage,Cage,24-Jun,23.232
+Vulgaris small,NE,Cage,Cage,24-Jun,45.276
+Vulgaris small,S,Cage,Cage,24-Jun,25.68342857
+Waterfall,NE,Cage,Beginning,16-May,0
+Waterfall,NW,Cage,Beginning,16-May,0
+Waterfall,South,Cage,Beginning,16-May,0
+Waterfall,NE,Cage,Treatment,28-May,1.3
+Waterfall,NW,Cage,Treatment,28-May,2.245454545
+Waterfall,South,Cage,Treatment,28-May,1.063636364
+Waterfall,NE,Cage,Cage,18-Jun,23.64
+Waterfall,NW,Cage,Cage,18-Jun,11.3625
+Waterfall,South,Cage,Cage,18-Jun,13.175

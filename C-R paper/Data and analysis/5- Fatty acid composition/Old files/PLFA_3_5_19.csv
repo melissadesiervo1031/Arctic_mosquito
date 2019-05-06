@@ -1,0 +1,459 @@
+Batch,ID,Pond,Pond2,Fatty acid,Type,Type2,Amount,Totalmicrobialbiomass
+2,3,Waterfall,Waterfall,12:00,Too ubiquitous/unknown,Too ubiquitous/unknown,2.458301464,1344.656001
+2,6,Vulgaris,Vulgaris1,12:00,Too ubiquitous/unknown,Too ubiquitous/unknown,8.530395521,2200.485789
+2,7,Vulgaris,Vulgaris2,12:00,Too ubiquitous/unknown,Too ubiquitous/unknown,6.058887565,1350.729005
+2,8,Vulgaris small,Vulgaris small,12:00,Too ubiquitous/unknown,Too ubiquitous/unknown,6.748312718,1464.957403
+2,9,Ice,Ice,12:00,Too ubiquitous/unknown,Too ubiquitous/unknown,2.215171326,684.0302645
+1,10,East,East,12:00,Too ubiquitous/unknown,Too ubiquitous/unknown,1.365075863,528.3131825
+1,12,Vulgaris,Vulgaris3,12:00,Too ubiquitous/unknown,Too ubiquitous/unknown,3.155294466,2014.659409
+1,12,Vulgaris,Vulgaris3,13:00,Bacteria,Bacteria,1.00648833,2014.659409
+2,1,Oil,Oil,14:00,Too ubiquitous/unknown,Too ubiquitous/unknown,46.29203409,1407.704611
+2,2,NoOil,NoOil,14:00,Too ubiquitous/unknown,Too ubiquitous/unknown,38.83852666,1236.943846
+2,3,Waterfall,Waterfall,14:00,Too ubiquitous/unknown,Too ubiquitous/unknown,48.97450708,1344.656001
+2,4,Golf,Golf1,14:00,Too ubiquitous/unknown,Too ubiquitous/unknown,19.5386513,412.9921851
+2,5,Golf,Golf2,14:00,Too ubiquitous/unknown,Too ubiquitous/unknown,20.56956476,551.4203503
+2,6,Vulgaris,Vulgaris1,14:00,Too ubiquitous/unknown,Too ubiquitous/unknown,162.9426618,2200.485789
+2,7,Vulgaris,Vulgaris2,14:00,Too ubiquitous/unknown,Too ubiquitous/unknown,75.74967321,1350.729005
+2,8,Vulgaris small,Vulgaris small,14:00,Too ubiquitous/unknown,Too ubiquitous/unknown,102.2234111,1464.957403
+2,9,Ice,Ice,14:00,Too ubiquitous/unknown,Too ubiquitous/unknown,30.95748493,684.0302645
+1,10,East,East,14:00,Too ubiquitous/unknown,Too ubiquitous/unknown,26.53060801,528.3131825
+1,11,Golf,Golf3,14:00,Too ubiquitous/unknown,Too ubiquitous/unknown,26.95653089,760.0966858
+1,12,Vulgaris,Vulgaris3,14:00,Too ubiquitous/unknown,Too ubiquitous/unknown,54.87133494,2014.659409
+2,1,Oil,Oil,15:00,Bacteria,Bacteria,17.82057307,1407.704611
+2,2,NoOil,NoOil,15:00,Bacteria,Bacteria,17.06925726,1236.943846
+2,3,Waterfall,Waterfall,15:00,Bacteria,Bacteria,10.12816091,1344.656001
+2,4,Golf,Golf1,15:00,Bacteria,Bacteria,4.363545137,412.9921851
+2,5,Golf,Golf2,15:00,Bacteria,Bacteria,5.065149096,551.4203503
+2,6,Vulgaris,Vulgaris1,15:00,Bacteria,Bacteria,33.8777989,2200.485789
+2,7,Vulgaris,Vulgaris2,15:00,Bacteria,Bacteria,20.57283127,1350.729005
+2,8,Vulgaris small,Vulgaris small,15:00,Bacteria,Bacteria,15.24695254,1464.957403
+2,9,Ice,Ice,15:00,Bacteria,Bacteria,3.935018987,684.0302645
+1,10,East,East,15:00,Bacteria,Bacteria,3.497891163,528.3131825
+1,11,Golf,Golf3,15:00,Bacteria,Bacteria,3.08208179,760.0966858
+1,12,Vulgaris,Vulgaris3,15:00,Bacteria,Bacteria,12.62031761,2014.659409
+2,1,Oil,Oil,16:00,Too ubiquitous/unknown,Too ubiquitous/unknown,366.4178672,1407.704611
+2,2,NoOil,NoOil,16:00,Too ubiquitous/unknown,Too ubiquitous/unknown,252.1086944,1236.943846
+2,3,Waterfall,Waterfall,16:00,Too ubiquitous/unknown,Too ubiquitous/unknown,266.9622564,1344.656001
+2,4,Golf,Golf1,16:00,Too ubiquitous/unknown,Too ubiquitous/unknown,76.33816394,412.9921851
+2,5,Golf,Golf2,16:00,Too ubiquitous/unknown,Too ubiquitous/unknown,109.8722598,551.4203503
+2,9,Ice,Ice,16:00,Too ubiquitous/unknown,Too ubiquitous/unknown,173.0691923,684.0302645
+1,10,East,East,16:00,Too ubiquitous/unknown,Too ubiquitous/unknown,127.9834332,528.3131825
+1,11,Golf,Golf3,16:00,Too ubiquitous/unknown,Too ubiquitous/unknown,134.4147444,760.0966858
+1,12,Vulgaris,Vulgaris3,16:00,Too ubiquitous/unknown,Too ubiquitous/unknown,344.6000929,2014.659409
+2,3,Waterfall,Waterfall,17:00,Bacteria,Bacteria,6.615802009,1344.656001
+2,6,Vulgaris,Vulgaris1,17:00,Bacteria,Bacteria,15.07610395,2200.485789
+2,7,Vulgaris,Vulgaris2,17:00,Bacteria,Bacteria,14.18076482,1350.729005
+2,8,Vulgaris small,Vulgaris small,17:00,Bacteria,Bacteria,8.248940893,1464.957403
+2,9,Ice,Ice,17:00,Bacteria,Bacteria,2.972909305,684.0302645
+1,10,East,East,17:00,Bacteria,Bacteria,1.903087986,528.3131825
+1,11,Golf,Golf3,17:00,Bacteria,Bacteria,2.709860997,760.0966858
+1,12,Vulgaris,Vulgaris3,17:00,Bacteria,Bacteria,9.655533533,2014.659409
+2,1,Oil,Oil,18:00,Bacteria,Bacteria,112.5537085,1407.704611
+2,2,NoOil,NoOil,18:00,Bacteria,Bacteria,75.69200536,1236.943846
+2,3,Waterfall,Waterfall,18:00,Bacteria,Bacteria,36.81027593,1344.656001
+2,4,Golf,Golf1,18:00,Bacteria,Bacteria,16.61892974,412.9921851
+2,5,Golf,Golf2,18:00,Bacteria,Bacteria,30.02623394,551.4203503
+2,6,Vulgaris,Vulgaris1,18:00,Bacteria,Bacteria,102.3839925,2200.485789
+2,7,Vulgaris,Vulgaris2,18:00,Bacteria,Bacteria,175.9795649,1350.729005
+2,8,Vulgaris small,Vulgaris small,18:00,Bacteria,Bacteria,52.6544893,1464.957403
+2,9,Ice,Ice,18:00,Bacteria,Bacteria,19.69196673,684.0302645
+1,10,East,East,18:00,Bacteria,Bacteria,15.32734182,528.3131825
+1,11,Golf,Golf3,18:00,Bacteria,Bacteria,20.62440926,760.0966858
+1,12,Vulgaris,Vulgaris3,18:00,Bacteria,Bacteria,66.37626937,2014.659409
+2,3,Waterfall,Waterfall,20:00,Too ubiquitous/unknown,Too ubiquitous/unknown,2.560621689,1344.656001
+2,6,Vulgaris,Vulgaris1,20:00,Too ubiquitous/unknown,Too ubiquitous/unknown,8.435793751,2200.485789
+2,7,Vulgaris,Vulgaris2,20:00,Too ubiquitous/unknown,Too ubiquitous/unknown,11.6884639,1350.729005
+2,8,Vulgaris small,Vulgaris small,20:00,Too ubiquitous/unknown,Too ubiquitous/unknown,3.277283341,1464.957403
+2,9,Ice,Ice,20:00,Too ubiquitous/unknown,Too ubiquitous/unknown,3.070733271,684.0302645
+1,10,East,East,20:00,Too ubiquitous/unknown,Too ubiquitous/unknown,1.640322173,528.3131825
+1,11,Golf,Golf3,20:00,Too ubiquitous/unknown,Too ubiquitous/unknown,1.965468468,760.0966858
+1,12,Vulgaris,Vulgaris3,20:00,Too ubiquitous/unknown,Too ubiquitous/unknown,6.11577661,2014.659409
+2,3,Waterfall,Waterfall,22:00,Vascular plant detritus,Vascular plant detritus,4.071948012,1344.656001
+2,6,Vulgaris,Vulgaris1,22:00,Vascular plant detritus,Vascular plant detritus,33.01926415,2200.485789
+2,7,Vulgaris,Vulgaris2,22:00,Vascular plant detritus,Vascular plant detritus,6.246857387,1350.729005
+2,8,Vulgaris small,Vulgaris small,22:00,Vascular plant detritus,Vascular plant detritus,6.246441108,1464.957403
+2,9,Ice,Ice,22:00,Vascular plant detritus,Vascular plant detritus,2.484494722,684.0302645
+1,10,East,East,22:00,Vascular plant detritus,Vascular plant detritus,2.469627128,528.3131825
+1,11,Golf,Golf3,22:00,Vascular plant detritus,Vascular plant detritus,1.997234886,760.0966858
+1,12,Vulgaris,Vulgaris3,22:00,Vascular plant detritus,Vascular plant detritus,4.537019273,2014.659409
+1,12,Vulgaris,Vulgaris3,23:00,Vascular plant detritus,Vascular plant detritus,0.941643702,2014.659409
+2,3,Waterfall,Waterfall,24:00:00,Vascular plant detritus,Vascular plant detritus,4.857736414,1344.656001
+2,6,Vulgaris,Vulgaris1,24:00:00,Vascular plant detritus,Vascular plant detritus,22.53938049,2200.485789
+2,7,Vulgaris,Vulgaris2,24:00:00,Vascular plant detritus,Vascular plant detritus,6.040933369,1350.729005
+2,8,Vulgaris small,Vulgaris small,24:00:00,Vascular plant detritus,Vascular plant detritus,5.74590274,1464.957403
+2,9,Ice,Ice,24:00:00,Vascular plant detritus,Vascular plant detritus,2.480974649,684.0302645
+1,10,East,East,24:00:00,Vascular plant detritus,Vascular plant detritus,2.324996533,528.3131825
+1,11,Golf,Golf3,24:00:00,Vascular plant detritus,Vascular plant detritus,2.608223474,760.0966858
+1,12,Vulgaris,Vulgaris3,24:00:00,Vascular plant detritus,Vascular plant detritus,4.03163656,2014.659409
+2,1,Oil,Oil, 17:1 iso w9c,Bacteria,Bacteria,26.97987305,1407.704611
+2,6,Vulgaris,Vulgaris1,10:0 2OH,Bacteria,Bacteria,10.05386692,2200.485789
+2,8,Vulgaris small,Vulgaris small,10:0 2OH,Bacteria,Bacteria,8.999623378,1464.957403
+2,9,Ice,Ice,10:0 2OH,Bacteria,Bacteria,1.665448458,684.0302645
+1,12,Vulgaris,Vulgaris3,10:0 2OH,Bacteria,Bacteria,1.703725326,2014.659409
+2,8,Vulgaris small,Vulgaris small,13:0 iso,Bacteria,Bacteria,4.811797577,1464.957403
+1,12,Vulgaris,Vulgaris3,13:0 iso,Bacteria,Bacteria,1.201543267,2014.659409
+2,3,Waterfall,Waterfall,14:0 iso,Bacteria,Bacteria,18.45837163,1344.656001
+2,4,Golf,Golf1,14:0 iso,Bacteria,Bacteria,3.740284987,412.9921851
+2,5,Golf,Golf2,14:0 iso,Bacteria,Bacteria,4.650664458,551.4203503
+2,6,Vulgaris,Vulgaris1,14:0 iso,Bacteria,Bacteria,31.00511284,2200.485789
+2,7,Vulgaris,Vulgaris2,14:0 iso,Bacteria,Bacteria,32.54256429,1350.729005
+2,8,Vulgaris small,Vulgaris small,14:0 iso,Bacteria,Bacteria,28.55652362,1464.957403
+2,9,Ice,Ice,14:0 iso,Bacteria,Bacteria,3.522611757,684.0302645
+1,10,East,East,14:0 iso,Bacteria,Bacteria,1.840426462,528.3131825
+1,11,Golf,Golf3,14:0 iso,Bacteria,Bacteria,3.664794853,760.0966858
+1,12,Vulgaris,Vulgaris3,14:0 iso,Bacteria,Bacteria,23.22916701,2014.659409
+2,7,Vulgaris,Vulgaris2,14:1 w5c,Bacteria,Bacteria,3.548278101,1350.729005
+2,8,Vulgaris small,Vulgaris small,14:1 w5c,Bacteria,Bacteria,3.022828426,1464.957403
+1,12,Vulgaris,Vulgaris3,14:1 w5c,Bacteria,Bacteria,1.924655501,2014.659409
+2,3,Waterfall,Waterfall,14:1 w7c,Too ubiquitous/unknown,Too ubiquitous/unknown,2.932602003,1344.656001
+2,7,Vulgaris,Vulgaris2,14:1 w7c,Too ubiquitous/unknown,Too ubiquitous/unknown,6.735855124,1350.729005
+2,8,Vulgaris small,Vulgaris small,14:1 w7c,Too ubiquitous/unknown,Too ubiquitous/unknown,4.629336032,1464.957403
+1,12,Vulgaris,Vulgaris3,14:1 w7c,Too ubiquitous/unknown,Too ubiquitous/unknown,0.77566706,2014.659409
+1,12,Vulgaris,Vulgaris3,14:1 w7c,Too ubiquitous/unknown,Too ubiquitous/unknown,1.577781663,2014.659409
+2,1,Oil,Oil,15:0 anteiso,Bacteria,Bacteria,26.947225,1407.704611
+2,2,NoOil,NoOil,15:0 anteiso,Bacteria,Bacteria,20.58975415,1236.943846
+2,3,Waterfall,Waterfall,15:0 anteiso,Bacteria,Bacteria,20.65626396,1344.656001
+2,4,Golf,Golf1,15:0 anteiso,Bacteria,Bacteria,12.74506377,412.9921851
+2,5,Golf,Golf2,15:0 anteiso,Bacteria,Bacteria,15.0629236,551.4203503
+2,6,Vulgaris,Vulgaris1,15:0 anteiso,Bacteria,Bacteria,34.78782907,2200.485789
+2,7,Vulgaris,Vulgaris2,15:0 anteiso,Bacteria,Bacteria,35.96594554,1350.729005
+2,8,Vulgaris small,Vulgaris small,15:0 anteiso,Bacteria,Bacteria,30.31006515,1464.957403
+2,9,Ice,Ice,15:0 anteiso,Bacteria,Bacteria,8.572461087,684.0302645
+1,10,East,East,15:0 anteiso,Bacteria,Bacteria,7.117196418,528.3131825
+1,11,Golf,Golf3,15:0 anteiso,Bacteria,Bacteria,17.45755541,760.0966858
+1,12,Vulgaris,Vulgaris3,15:0 anteiso,Bacteria,Bacteria,28.02339504,2014.659409
+2,1,Oil,Oil,15:0 iso,Bacteria,Bacteria,22.67208416,1407.704611
+2,2,NoOil,NoOil,15:0 iso,Bacteria,Bacteria,18.20204942,1236.943846
+2,3,Waterfall,Waterfall,15:0 iso,Bacteria,Bacteria,28.54722754,1344.656001
+2,4,Golf,Golf1,15:0 iso,Bacteria,Bacteria,9.321231498,412.9921851
+2,5,Golf,Golf2,15:0 iso,Bacteria,Bacteria,10.52410877,551.4203503
+2,6,Vulgaris,Vulgaris1,15:0 iso,Bacteria,Bacteria,82.34108553,2200.485789
+2,7,Vulgaris,Vulgaris2,15:0 iso,Bacteria,Bacteria,53.41993658,1350.729005
+2,8,Vulgaris small,Vulgaris small,15:0 iso,Bacteria,Bacteria,53.14132172,1464.957403
+2,9,Ice,Ice,15:0 iso,Bacteria,Bacteria,11.00151175,684.0302645
+1,10,East,East,15:0 iso,Bacteria,Bacteria,9.364285283,528.3131825
+1,11,Golf,Golf3,15:0 iso,Bacteria,Bacteria,14.74595964,760.0966858
+1,12,Vulgaris,Vulgaris3,15:0 iso,Bacteria,Bacteria,46.42695003,2014.659409
+2,3,Waterfall,Waterfall,15:1 anteiso w9c,Bacteria,Bacteria,1.688083134,1344.656001
+2,8,Vulgaris small,Vulgaris small,15:1 anteiso w9c,Bacteria,Bacteria,2.441872853,1464.957403
+1,11,Golf,Golf3,15:1 anteiso w9c,Bacteria,Bacteria,1.89662661,760.0966858
+1,12,Vulgaris,Vulgaris3,15:1 anteiso w9c,Bacteria,Bacteria,3.101948839,2014.659409
+2,3,Waterfall,Waterfall,15:1 iso w6c,Bacteria,Bacteria,17.95395922,1344.656001
+2,4,Golf,Golf1,15:1 iso w6c,Bacteria,Bacteria,3.864736165,412.9921851
+2,5,Golf,Golf2,15:1 iso w6c,Bacteria,Bacteria,5.409998745,551.4203503
+2,6,Vulgaris,Vulgaris1,15:1 iso w6c,Bacteria,Bacteria,55.64088522,2200.485789
+2,7,Vulgaris,Vulgaris2,15:1 iso w6c,Bacteria,Bacteria,35.89508957,1350.729005
+2,8,Vulgaris small,Vulgaris small,15:1 iso w6c,Bacteria,Bacteria,40.35074543,1464.957403
+2,9,Ice,Ice,15:1 iso w6c,Bacteria,Bacteria,5.363680916,684.0302645
+1,10,East,East,15:1 iso w6c,Bacteria,Bacteria,5.223016967,528.3131825
+1,11,Golf,Golf3,15:1 iso w6c,Bacteria,Bacteria,6.980902806,760.0966858
+1,12,Vulgaris,Vulgaris3,15:1 iso w6c,Bacteria,Bacteria,30.60978951,2014.659409
+1,12,Vulgaris,Vulgaris3,15:1 w5c,Bacteria,Bacteria,0.978632436,2014.659409
+2,3,Waterfall,Waterfall,15:1 w6c,Bacteria,Bacteria,1.431602942,1344.656001
+2,6,Vulgaris,Vulgaris1,15:1 w6c,Bacteria,Bacteria,8.971571844,2200.485789
+2,7,Vulgaris,Vulgaris2,15:1 w6c,Bacteria,Bacteria,3.949231459,1350.729005
+2,8,Vulgaris small,Vulgaris small,15:1 w6c,Bacteria,Bacteria,3.062283361,1464.957403
+1,12,Vulgaris,Vulgaris3,15:1 w6c,Bacteria,Bacteria,3.152778769,2014.659409
+1,12,Vulgaris,Vulgaris3,15:1 w9c,Bacteria,Bacteria,1.236632927,2014.659409
+2,4,Golf,Golf1,16:0 10-methyl,Bacteria,Bacteria,3.924204782,412.9921851
+1,10,East,East,16:0 10-methyl,Bacteria,Bacteria,1.986216791,528.3131825
+1,11,Golf,Golf3,16:0 10-methyl,Bacteria,Bacteria,4.550581217,760.0966858
+1,12,Vulgaris,Vulgaris3,16:0 10-methyl,Bacteria,Bacteria,13.24135065,2014.659409
+2,3,Waterfall,Waterfall,16:0 anteiso,Bacteria,Bacteria,7.509712651,1344.656001
+2,6,Vulgaris,Vulgaris1,16:0 anteiso,Bacteria,Bacteria,45.76114702,2200.485789
+2,7,Vulgaris,Vulgaris2,16:0 anteiso,Bacteria,Bacteria,19.87199081,1350.729005
+2,8,Vulgaris small,Vulgaris small,16:0 anteiso,Bacteria,Bacteria,15.50946402,1464.957403
+2,9,Ice,Ice,16:0 anteiso,Bacteria,Bacteria,3.509404275,684.0302645
+1,10,East,East,16:0 anteiso,Bacteria,Bacteria,2.138426689,528.3131825
+2,3,Waterfall,Waterfall,16:0 iso,Bacteria,Bacteria,12.30024219,1344.656001
+2,4,Golf,Golf1,16:0 iso,Bacteria,Bacteria,7.030917472,412.9921851
+2,5,Golf,Golf2,16:0 iso,Bacteria,Bacteria,5.13636344,551.4203503
+2,6,Vulgaris,Vulgaris1,16:0 iso,Bacteria,Bacteria,29.14202145,2200.485789
+2,7,Vulgaris,Vulgaris2,16:0 iso,Bacteria,Bacteria,22.92412189,1350.729005
+2,8,Vulgaris small,Vulgaris small,16:0 iso,Bacteria,Bacteria,18.00210912,1464.957403
+2,9,Ice,Ice,16:0 iso,Bacteria,Bacteria,4.079014724,684.0302645
+1,10,East,East,16:0 iso,Bacteria,Bacteria,3.705811407,528.3131825
+1,11,Golf,Golf3,16:0 iso,Bacteria,Bacteria,7.298233979,760.0966858
+1,12,Vulgaris,Vulgaris3,16:0 iso,Bacteria,Bacteria,17.96465818,2014.659409
+2,3,Waterfall,Waterfall,16:1 w3c,Too ubiquitous/unknown,Too ubiquitous/unknown,3.965244198,1344.656001
+2,6,Vulgaris,Vulgaris1,16:1 w3c,Too ubiquitous/unknown,Too ubiquitous/unknown,42.37761853,2200.485789
+2,7,Vulgaris,Vulgaris2,16:1 w3c,Too ubiquitous/unknown,Too ubiquitous/unknown,9.007351518,1350.729005
+2,9,Ice,Ice,16:1 w3c,Too ubiquitous/unknown,Too ubiquitous/unknown,2.56537379,684.0302645
+1,10,East,East,16:1 w3c,Too ubiquitous/unknown,Too ubiquitous/unknown,2.034524388,528.3131825
+1,12,Vulgaris,Vulgaris3,16:1 w3c,Too ubiquitous/unknown,Too ubiquitous/unknown,4.302051071,2014.659409
+2,1,Oil,Oil,16:1 w5c,Bacteria,Bacteria,22.87489338,1407.704611
+2,2,NoOil,NoOil,16:1 w5c,Bacteria,Bacteria,30.21496615,1236.943846
+2,3,Waterfall,Waterfall,16:1 w5c,Bacteria,Bacteria,30.34844682,1344.656001
+2,4,Golf,Golf1,16:1 w5c,Bacteria,Bacteria,14.73801366,412.9921851
+2,5,Golf,Golf2,16:1 w5c,Bacteria,Bacteria,17.2441052,551.4203503
+2,6,Vulgaris,Vulgaris1,16:1 w5c,Bacteria,Bacteria,69.16079681,2200.485789
+2,7,Vulgaris,Vulgaris2,16:1 w5c,Bacteria,Bacteria,54.47213986,1350.729005
+2,8,Vulgaris small,Vulgaris small,16:1 w5c,Bacteria,Bacteria,43.33844531,1464.957403
+2,9,Ice,Ice,16:1 w5c,Bacteria,Bacteria,7.515876712,684.0302645
+1,10,East,East,16:1 w5c,Bacteria,Bacteria,6.958067366,528.3131825
+1,11,Golf,Golf3,16:1 w5c,Bacteria,Bacteria,21.91411354,760.0966858
+1,12,Vulgaris,Vulgaris3,16:1 w5c,Bacteria,Bacteria,44.16413616,2014.659409
+2,1,Oil,Oil,16:1 w7c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",179.5529009,1407.704611
+2,2,NoOil,NoOil,16:1 w7c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",227.925254,1236.943846
+2,3,Waterfall,Waterfall,16:1 w7c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",184.3036669,1344.656001
+2,4,Golf,Golf1,16:1 w7c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",73.06701065,412.9921851
+2,5,Golf,Golf2,16:1 w7c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",88.40970098,551.4203503
+2,9,Ice,Ice,16:1 w7c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",75.19414294,684.0302645
+1,10,East,East,16:1 w7c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",76.25096025,528.3131825
+1,11,Golf,Golf3,16:1 w7c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",112.8787756,760.0966858
+1,12,Vulgaris,Vulgaris3,16:1 w7c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",374.530361,2014.659409
+2,2,NoOil,NoOil,16:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",36.11752747,1236.943846
+2,3,Waterfall,Waterfall,16:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",8.785260432,1344.656001
+2,6,Vulgaris,Vulgaris1,16:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",64.73906097,2200.485789
+2,7,Vulgaris,Vulgaris2,16:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",14.28000567,1350.729005
+2,8,Vulgaris small,Vulgaris small,16:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",12.90962936,1464.957403
+2,9,Ice,Ice,16:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",4.150239216,684.0302645
+1,10,East,East,16:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",3.410247762,528.3131825
+1,11,Golf,Golf3,16:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",1.724932589,760.0966858
+1,12,Vulgaris,Vulgaris3,16:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",10.8665428,2014.659409
+2,3,Waterfall,Waterfall,17:0 10-methyl,Bacteria,Bacteria,1.810408327,1344.656001
+2,7,Vulgaris,Vulgaris2,17:0 10-methyl,Bacteria,Bacteria,4.099813234,1350.729005
+2,8,Vulgaris small,Vulgaris small,17:0 10-methyl,Bacteria,Bacteria,1.6923483,1464.957403
+1,12,Vulgaris,Vulgaris3,17:0 10-methyl,Bacteria,Bacteria,2.576113575,2014.659409
+2,3,Waterfall,Waterfall,17:0 anteiso,Bacteria,Bacteria,6.190828625,1344.656001
+2,4,Golf,Golf1,17:0 anteiso,Bacteria,Bacteria,3.487798743,412.9921851
+2,5,Golf,Golf2,17:0 anteiso,Bacteria,Bacteria,5.377368942,551.4203503
+2,6,Vulgaris,Vulgaris1,17:0 anteiso,Bacteria,Bacteria,11.2729109,2200.485789
+2,7,Vulgaris,Vulgaris2,17:0 anteiso,Bacteria,Bacteria,8.861935044,1350.729005
+2,8,Vulgaris small,Vulgaris small,17:0 anteiso,Bacteria,Bacteria,9.270892343,1464.957403
+2,9,Ice,Ice,17:0 anteiso,Bacteria,Bacteria,2.539862779,684.0302645
+1,10,East,East,17:0 anteiso,Bacteria,Bacteria,1.770954511,528.3131825
+1,11,Golf,Golf3,17:0 anteiso,Bacteria,Bacteria,5.833995896,760.0966858
+1,12,Vulgaris,Vulgaris3,17:0 anteiso,Bacteria,Bacteria,6.194119943,2014.659409
+2,7,Vulgaris,Vulgaris2,17:0 cyclo w7c,Bacteria,Bacteria,5.005597667,1350.729005
+2,8,Vulgaris small,Vulgaris small,17:0 cyclo w7c,Bacteria,Bacteria,4.548556167,1464.957403
+2,9,Ice,Ice,17:0 cyclo w7c,Bacteria,Bacteria,2.631276505,684.0302645
+1,10,East,East,17:0 cyclo w7c,Bacteria,Bacteria,1.87146582,528.3131825
+1,12,Vulgaris,Vulgaris3,17:0 cyclo w7c,Bacteria,Bacteria,4.101680647,2014.659409
+2,3,Waterfall,Waterfall,17:0 iso,Bacteria,Bacteria,6.857921495,1344.656001
+2,6,Vulgaris,Vulgaris1,17:0 iso,Bacteria,Bacteria,7.731160313,2200.485789
+2,7,Vulgaris,Vulgaris2,17:0 iso,Bacteria,Bacteria,6.981278305,1350.729005
+2,8,Vulgaris small,Vulgaris small,17:0 iso,Bacteria,Bacteria,7.689390563,1464.957403
+2,9,Ice,Ice,17:0 iso,Bacteria,Bacteria,1.568889125,684.0302645
+1,10,East,East,17:0 iso,Bacteria,Bacteria,1.212864515,528.3131825
+1,11,Golf,Golf3,17:0 iso,Bacteria,Bacteria,3.232419824,760.0966858
+1,12,Vulgaris,Vulgaris3,17:0 iso,Bacteria,Bacteria,6.241136854,2014.659409
+1,11,Golf,Golf3,17:1 anteiso w9c,Bacteria,Bacteria,1.352737757,760.0966858
+1,12,Vulgaris,Vulgaris3,17:1 anteiso w9c,Bacteria,Bacteria,2.248121264,2014.659409
+2,3,Waterfall,Waterfall,17:1 iso w10c,Bacteria,Bacteria,12.48310375,1344.656001
+2,6,Vulgaris,Vulgaris1,17:1 iso w10c,Bacteria,Bacteria,21.35798374,2200.485789
+2,7,Vulgaris,Vulgaris2,17:1 iso w10c,Bacteria,Bacteria,16.35410953,1350.729005
+2,8,Vulgaris small,Vulgaris small,17:1 iso w10c,Bacteria,Bacteria,13.69345891,1464.957403
+2,9,Ice,Ice,17:1 iso w10c,Bacteria,Bacteria,3.709651057,684.0302645
+2,2,NoOil,NoOil,17:1 iso w9c,Bacteria,Bacteria,40.35781998,1236.943846
+2,3,Waterfall,Waterfall,17:1 iso w9c,Bacteria,Bacteria,9.137211553,1344.656001
+2,4,Golf,Golf1,17:1 iso w9c,Bacteria,Bacteria,8.421562842,412.9921851
+2,5,Golf,Golf2,17:1 iso w9c,Bacteria,Bacteria,7.11970848,551.4203503
+2,6,Vulgaris,Vulgaris1,17:1 iso w9c,Bacteria,Bacteria,15.75469215,2200.485789
+2,7,Vulgaris,Vulgaris2,17:1 iso w9c,Bacteria,Bacteria,11.07135656,1350.729005
+2,8,Vulgaris small,Vulgaris small,17:1 iso w9c,Bacteria,Bacteria,7.686437639,1464.957403
+2,9,Ice,Ice,17:1 iso w9c,Bacteria,Bacteria,2.187180629,684.0302645
+1,11,Golf,Golf3,17:1 iso w9c,Bacteria,Bacteria,1.851319088,760.0966858
+1,12,Vulgaris,Vulgaris3,17:1 iso w9c,Bacteria,Bacteria,2.821838645,2014.659409
+2,3,Waterfall,Waterfall,17:1 w6c,Bacteria,Bacteria,6.452742688,1344.656001
+2,6,Vulgaris,Vulgaris1,17:1 w6c,Bacteria,Bacteria,11.42938597,2200.485789
+2,7,Vulgaris,Vulgaris2,17:1 w6c,Bacteria,Bacteria,4.618459255,1350.729005
+2,8,Vulgaris small,Vulgaris small,17:1 w6c,Bacteria,Bacteria,3.125230204,1464.957403
+1,12,Vulgaris,Vulgaris3,17:1 w6c,Bacteria,Bacteria,3.450260732,2014.659409
+2,3,Waterfall,Waterfall,17:1 w8c,Bacteria,Bacteria,9.413444452,1344.656001
+2,6,Vulgaris,Vulgaris1,17:1 w8c,Bacteria,Bacteria,28.01889582,2200.485789
+2,7,Vulgaris,Vulgaris2,17:1 w8c,Bacteria,Bacteria,22.07338695,1350.729005
+2,8,Vulgaris small,Vulgaris small,17:1 w8c,Bacteria,Bacteria,12.1376415,1464.957403
+2,9,Ice,Ice,17:1 w8c,Bacteria,Bacteria,2.621155413,684.0302645
+1,10,East,East,17:1 w8c,Bacteria,Bacteria,2.43187328,528.3131825
+1,11,Golf,Golf3,17:1 w8c,Bacteria,Bacteria,2.397552012,760.0966858
+1,12,Vulgaris,Vulgaris3,17:1 w8c,Bacteria,Bacteria,13.9269315,2014.659409
+2,3,Waterfall,Waterfall,18:0 10-methyl,Bacteria,Bacteria,6.308860622,1344.656001
+2,6,Vulgaris,Vulgaris1,18:0 10-methyl,Bacteria,Bacteria,5.213135151,2200.485789
+2,7,Vulgaris,Vulgaris2,18:0 10-methyl,Bacteria,Bacteria,7.985736419,1350.729005
+2,8,Vulgaris small,Vulgaris small,18:0 10-methyl,Bacteria,Bacteria,4.981099944,1464.957403
+1,10,East,East,18:0 10-methyl,Bacteria,Bacteria,1.091409251,528.3131825
+1,11,Golf,Golf3,18:0 10-methyl,Bacteria,Bacteria,1.431942898,760.0966858
+1,12,Vulgaris,Vulgaris3,18:0 10-methyl,Bacteria,Bacteria,7.426572288,2014.659409
+1,12,Vulgaris,Vulgaris3,18:0 iso,Bacteria,Bacteria,6.19965944,2014.659409
+2,3,Waterfall,Waterfall,18:1 w5c,Bacteria,Bacteria,5.070117423,1344.656001
+2,6,Vulgaris,Vulgaris1,18:1 w5c,Bacteria,Bacteria,7.281065471,2200.485789
+2,7,Vulgaris,Vulgaris2,18:1 w5c,Bacteria,Bacteria,8.060423433,1350.729005
+2,8,Vulgaris small,Vulgaris small,18:1 w5c,Bacteria,Bacteria,5.277662761,1464.957403
+2,9,Ice,Ice,18:1 w5c,Bacteria,Bacteria,2.133982713,684.0302645
+1,10,East,East,18:1 w5c,Bacteria,Bacteria,3.505157504,528.3131825
+1,11,Golf,Golf3,18:1 w5c,Bacteria,Bacteria,4.512135585,760.0966858
+1,12,Vulgaris,Vulgaris3,18:1 w5c,Bacteria,Bacteria,11.50874708,2014.659409
+2,1,Oil,Oil,18:1 w7c,"Algae, cyanobacteria, diatoms",Bacteria,238.5297123,1407.704611
+2,2,NoOil,NoOil,18:1 w7c,"Algae, cyanobacteria, diatoms",Bacteria,123.4190383,1236.943846
+2,3,Waterfall,Waterfall,18:1 w7c,"Algae, cyanobacteria, diatoms",Bacteria,263.7437394,1344.656001
+2,4,Golf,Golf1,18:1 w7c,"Algae, cyanobacteria, diatoms",Bacteria,74.7698935,412.9921851
+2,5,Golf,Golf2,18:1 w7c,"Algae, cyanobacteria, diatoms",Bacteria,117.7848719,551.4203503
+2,8,Vulgaris small,Vulgaris small,18:1 w7c,"Algae, cyanobacteria, diatoms",Bacteria,397.5795611,1464.957403
+2,9,Ice,Ice,18:1 w7c,"Algae, cyanobacteria, diatoms",Bacteria,42.3846832,684.0302645
+1,10,East,East,18:1 w7c,"Algae, cyanobacteria, diatoms",Bacteria,78.43274942,528.3131825
+1,11,Golf,Golf3,18:1 w7c,"Algae, cyanobacteria, diatoms",Bacteria,158.9920197,760.0966858
+1,12,Vulgaris,Vulgaris3,18:1 w7c,"Algae, cyanobacteria, diatoms",Bacteria,359.1657659,2014.659409
+2,3,Waterfall,Waterfall,18:1 w7c 10-methyl,Bacteria,Bacteria,5.415164461,1344.656001
+2,6,Vulgaris,Vulgaris1,18:1 w7c 10-methyl,Bacteria,Bacteria,15.27629659,2200.485789
+2,7,Vulgaris,Vulgaris2,18:1 w7c 10-methyl,Bacteria,Bacteria,10.95570424,1350.729005
+2,8,Vulgaris small,Vulgaris small,18:1 w7c 10-methyl,Bacteria,Bacteria,9.229550327,1464.957403
+2,9,Ice,Ice,18:1 w7c 10-methyl,Bacteria,Bacteria,1.453307098,684.0302645
+1,11,Golf,Golf3,18:1 w7c 10-methyl,Bacteria,Bacteria,2.371453692,760.0966858
+1,12,Vulgaris,Vulgaris3,18:1 w7c 10-methyl,Bacteria,Bacteria,10.57517319,2014.659409
+2,2,NoOil,NoOil,18:1 w8c,Bacteria,Bacteria,102.6366507,1236.943846
+2,9,Ice,Ice,18:1 w8c,Bacteria,Bacteria,65.19031076,684.0302645
+2,1,Oil,Oil,18:1 w9c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",146.3401254,1407.704611
+2,2,NoOil,NoOil,18:1 w9c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",84.24149566,1236.943846
+2,3,Waterfall,Waterfall,18:1 w9c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",83.42715662,1344.656001
+2,4,Golf,Golf1,18:1 w9c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",29.7309947,412.9921851
+2,5,Golf,Golf2,18:1 w9c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",44.11063091,551.4203503
+2,6,Vulgaris,Vulgaris1,18:1 w9c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",316.553599,2200.485789
+2,7,Vulgaris,Vulgaris2,18:1 w9c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",205.1992971,1350.729005
+2,8,Vulgaris small,Vulgaris small,18:1 w9c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",189.5333085,1464.957403
+2,9,Ice,Ice,18:1 w9c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",45.14887172,684.0302645
+1,10,East,East,18:1 w9c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",41.10073556,528.3131825
+1,11,Golf,Golf3,18:1 w9c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",51.44820098,760.0966858
+1,12,Vulgaris,Vulgaris3,18:1 w9c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",119.0654115,2014.659409
+2,1,Oil,Oil,18:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",77.34072176,1407.704611
+2,2,NoOil,NoOil,18:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",62.32612404,1236.943846
+2,3,Waterfall,Waterfall,18:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",66.94556213,1344.656001
+2,4,Golf,Golf1,18:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",20.08668464,412.9921851
+2,5,Golf,Golf2,18:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",28.93738263,551.4203503
+2,6,Vulgaris,Vulgaris1,18:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",360.0935996,2200.485789
+2,7,Vulgaris,Vulgaris2,18:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",183.9972927,1350.729005
+2,8,Vulgaris small,Vulgaris small,18:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",103.987975,1464.957403
+2,9,Ice,Ice,18:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",53.48493654,684.0302645
+1,10,East,East,18:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",25.71003047,528.3131825
+1,11,Golf,Golf3,18:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",51.89844068,760.0966858
+1,12,Vulgaris,Vulgaris3,18:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",116.8085173,2014.659409
+2,1,Oil,Oil,18:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",29.17034803,1407.704611
+2,3,Waterfall,Waterfall,18:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",10.93334267,1344.656001
+2,6,Vulgaris,Vulgaris1,18:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",67.9722478,2200.485789
+2,7,Vulgaris,Vulgaris2,18:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",20.01209102,1350.729005
+2,8,Vulgaris small,Vulgaris small,18:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",17.60839882,1464.957403
+2,9,Ice,Ice,18:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",8.24618131,684.0302645
+1,10,East,East,18:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",4.930937497,528.3131825
+1,11,Golf,Golf3,18:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",5.532770685,760.0966858
+1,12,Vulgaris,Vulgaris3,18:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",15.52707141,2014.659409
+2,1,Oil,Oil,18:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",30.49200615,1407.704611
+2,3,Waterfall,Waterfall,18:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",21.4585168,1344.656001
+2,4,Golf,Golf1,18:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",9.964341499,412.9921851
+2,5,Golf,Golf2,18:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",7.35439447,551.4203503
+2,6,Vulgaris,Vulgaris1,18:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",122.9516147,2200.485789
+2,7,Vulgaris,Vulgaris2,18:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",36.30596483,1350.729005
+2,8,Vulgaris small,Vulgaris small,18:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",31.70366046,1464.957403
+2,9,Ice,Ice,18:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",21.87523132,684.0302645
+1,10,East,East,18:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",14.30867669,528.3131825
+1,11,Golf,Golf3,18:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",12.96644572,760.0966858
+1,12,Vulgaris,Vulgaris3,18:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",28.1945693,2014.659409
+2,3,Waterfall,Waterfall,19:0 cyclo w7c,Bacteria,Bacteria,4.736432235,1344.656001
+2,4,Golf,Golf1,19:0 cyclo w7c,Bacteria,Bacteria,2.715863644,412.9921851
+2,5,Golf,Golf2,19:0 cyclo w7c,Bacteria,Bacteria,4.457608507,551.4203503
+2,6,Vulgaris,Vulgaris1,19:0 cyclo w7c,Bacteria,Bacteria,8.512480676,2200.485789
+2,7,Vulgaris,Vulgaris2,19:0 cyclo w7c,Bacteria,Bacteria,4.844109783,1350.729005
+2,8,Vulgaris small,Vulgaris small,19:0 cyclo w7c,Bacteria,Bacteria,5.823393761,1464.957403
+2,9,Ice,Ice,19:0 cyclo w7c,Bacteria,Bacteria,1.572836062,684.0302645
+1,10,East,East,19:0 cyclo w7c,Bacteria,Bacteria,1.356673879,528.3131825
+1,11,Golf,Golf3,19:0 cyclo w7c,Bacteria,Bacteria,1.714527429,760.0966858
+1,12,Vulgaris,Vulgaris3,19:0 cyclo w7c,Bacteria,Bacteria,4.3912407,2014.659409
+2,3,Waterfall,Waterfall,19:1 w7c 10-methyl,Bacteria,Bacteria,2.403514915,1344.656001
+2,7,Vulgaris,Vulgaris2,19:1 w7c 10-methyl,Bacteria,Bacteria,4.608204914,1350.729005
+2,8,Vulgaris small,Vulgaris small,19:1 w7c 10-methyl,Bacteria,Bacteria,5.434614769,1464.957403
+1,10,East,East,19:1 w7c 10-methyl,Bacteria,Bacteria,1.523519556,528.3131825
+1,12,Vulgaris,Vulgaris3,19:1 w7c 10-methyl,Bacteria,Bacteria,2.356005731,2014.659409
+1,12,Vulgaris,Vulgaris3,19:1 w8c,Bacteria,Bacteria,2.297722771,2014.659409
+2,8,Vulgaris small,Vulgaris small,19:3 w6c,Too ubiquitous/unknown,Too ubiquitous/unknown,2.475592088,1464.957403
+2,9,Ice,Ice,19:3 w6c,Too ubiquitous/unknown,Too ubiquitous/unknown,0.910146579,684.0302645
+2,3,Waterfall,Waterfall,20:0 iso,Bacteria,Bacteria,1.897189176,1344.656001
+2,6,Vulgaris,Vulgaris1,20:0 iso,Bacteria,Bacteria,14.00075671,2200.485789
+2,7,Vulgaris,Vulgaris2,20:0 iso,Bacteria,Bacteria,5.793807313,1350.729005
+2,8,Vulgaris small,Vulgaris small,20:0 iso,Bacteria,Bacteria,5.112937098,1464.957403
+2,9,Ice,Ice,20:0 iso,Bacteria,Bacteria,1.586442787,684.0302645
+1,10,East,East,20:0 iso,Bacteria,Bacteria,1.50483619,528.3131825
+1,11,Golf,Golf3,20:0 iso,Bacteria,Bacteria,1.965996615,760.0966858
+1,12,Vulgaris,Vulgaris3,20:0 iso,Bacteria,Bacteria,5.149046856,2014.659409
+2,3,Waterfall,Waterfall,20:1 w8c,Too ubiquitous/unknown,Too ubiquitous/unknown,2.845474989,1344.656001
+2,6,Vulgaris,Vulgaris1,20:1 w8c,Too ubiquitous/unknown,Too ubiquitous/unknown,12.39998324,2200.485789
+2,7,Vulgaris,Vulgaris2,20:1 w8c,Too ubiquitous/unknown,Too ubiquitous/unknown,8.724517595,1350.729005
+2,8,Vulgaris small,Vulgaris small,20:1 w8c,Too ubiquitous/unknown,Too ubiquitous/unknown,7.881866037,1464.957403
+2,9,Ice,Ice,20:1 w8c,Too ubiquitous/unknown,Too ubiquitous/unknown,1.686464383,684.0302645
+1,12,Vulgaris,Vulgaris3,20:1 w8c,Too ubiquitous/unknown,Too ubiquitous/unknown,5.307587758,2014.659409
+2,3,Waterfall,Waterfall,20:1 w9c,Bacteria,Bacteria,6.104844606,1344.656001
+2,6,Vulgaris,Vulgaris1,20:1 w9c,Bacteria,Bacteria,20.16647333,2200.485789
+2,7,Vulgaris,Vulgaris2,20:1 w9c,Bacteria,Bacteria,13.9745238,1350.729005
+2,8,Vulgaris small,Vulgaris small,20:1 w9c,Bacteria,Bacteria,17.70552116,1464.957403
+2,9,Ice,Ice,20:1 w9c,Bacteria,Bacteria,3.742413914,684.0302645
+1,10,East,East,20:1 w9c,Bacteria,Bacteria,4.907173671,528.3131825
+1,11,Golf,Golf3,20:1 w9c,Bacteria,Bacteria,2.565402621,760.0966858
+1,12,Vulgaris,Vulgaris3,20:1 w9c,Bacteria,Bacteria,11.50872738,2014.659409
+2,3,Waterfall,Waterfall,20:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",3.229288809,1344.656001
+2,6,Vulgaris,Vulgaris1,20:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",6.647284444,2200.485789
+2,9,Ice,Ice,20:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",1.406548288,684.0302645
+1,12,Vulgaris,Vulgaris3,20:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",4.701485621,2014.659409
+2,3,Waterfall,Waterfall,20:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",2.954047676,1344.656001
+2,6,Vulgaris,Vulgaris1,20:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",12.42777379,2200.485789
+2,7,Vulgaris,Vulgaris2,20:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",9.477155417,1350.729005
+2,8,Vulgaris small,Vulgaris small,20:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",11.53173091,1464.957403
+2,9,Ice,Ice,20:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",1.274862518,684.0302645
+1,10,East,East,20:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",3.887158132,528.3131825
+1,11,Golf,Golf3,20:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",2.298505748,760.0966858
+1,12,Vulgaris,Vulgaris3,20:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",6.855374552,2014.659409
+2,1,Oil,Oil,20:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",22.95532291,1407.704611
+2,2,NoOil,NoOil,20:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",28.9592786,1236.943846
+2,3,Waterfall,Waterfall,20:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",22.0068458,1344.656001
+2,4,Golf,Golf1,20:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",3.586307898,412.9921851
+2,5,Golf,Golf2,20:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",4.601052015,551.4203503
+2,6,Vulgaris,Vulgaris1,20:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",70.10685885,2200.485789
+2,7,Vulgaris,Vulgaris2,20:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",41.1243866,1350.729005
+2,8,Vulgaris small,Vulgaris small,20:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",26.81480386,1464.957403
+2,9,Ice,Ice,20:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",10.82062921,684.0302645
+1,10,East,East,20:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",6.561891757,528.3131825
+1,11,Golf,Golf3,20:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",10.08210069,760.0966858
+1,12,Vulgaris,Vulgaris3,20:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",33.65780162,2014.659409
+2,1,Oil,Oil,20:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",40.76521482,1407.704611
+2,2,NoOil,NoOil,20:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",43.53571261,1236.943846
+2,3,Waterfall,Waterfall,20:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",38.23115836,1344.656001
+2,4,Golf,Golf1,20:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",6.93489589,412.9921851
+2,5,Golf,Golf2,20:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",8.503750179,551.4203503
+2,6,Vulgaris,Vulgaris1,20:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",138.830251,2200.485789
+2,7,Vulgaris,Vulgaris2,20:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",79.12917991,1350.729005
+2,8,Vulgaris small,Vulgaris small,20:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",58.87016699,1464.957403
+2,9,Ice,Ice,20:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",22.94542366,684.0302645
+1,10,East,East,20:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",13.84055898,528.3131825
+1,11,Golf,Golf3,20:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",23.495607,760.0966858
+1,12,Vulgaris,Vulgaris3,20:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",69.51852255,2014.659409
+2,8,Vulgaris small,Vulgaris small,21:1 w9c,Too ubiquitous/unknown,Too ubiquitous/unknown,3.503128331,1464.957403
+1,12,Vulgaris,Vulgaris3,22:1 w6c,Too ubiquitous/unknown,Too ubiquitous/unknown,1.193539529,2014.659409
+1,12,Vulgaris,Vulgaris3,22:1 w9c,Bacteria,Bacteria,1.303880916,2014.659409
+1,12,Vulgaris,Vulgaris3,22:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",2.05211579,2014.659409
+2,3,Waterfall,Waterfall,22:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",1.32735299,1344.656001
+2,6,Vulgaris,Vulgaris1,22:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",7.6171969,2200.485789
+2,8,Vulgaris small,Vulgaris small,22:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",3.262072275,1464.957403
+2,9,Ice,Ice,22:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",1.235026933,684.0302645
+1,11,Golf,Golf3,22:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",1.162428205,760.0966858
+1,12,Vulgaris,Vulgaris3,22:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",5.730694467,2014.659409
+2,2,NoOil,NoOil,22:5 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",13.92985187,1236.943846
+2,3,Waterfall,Waterfall,22:5 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",6.470234895,1344.656001
+2,4,Golf,Golf1,22:5 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",3.790853992,412.9921851
+2,5,Golf,Golf2,22:5 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",4.883366157,551.4203503
+2,6,Vulgaris,Vulgaris1,22:5 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",16.52054204,2200.485789
+2,7,Vulgaris,Vulgaris2,22:5 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",7.806954552,1350.729005
+2,8,Vulgaris small,Vulgaris small,22:5 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",7.26519932,1464.957403
+2,9,Ice,Ice,22:5 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",3.111023582,684.0302645
+1,10,East,East,22:5 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",2.051155999,528.3131825
+1,11,Golf,Golf3,22:5 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",10.83340556,760.0966858
+1,12,Vulgaris,Vulgaris3,22:5 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",9.004113392,2014.659409
+2,2,NoOil,NoOil,22:6 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",20.77983981,1236.943846
+2,3,Waterfall,Waterfall,22:6 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",14.48120235,1344.656001
+2,4,Golf,Golf1,22:6 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",4.212234642,412.9921851
+2,5,Golf,Golf2,22:6 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",6.319143355,551.4203503
+2,6,Vulgaris,Vulgaris1,22:6 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",36.91709908,2200.485789
+2,7,Vulgaris,Vulgaris2,22:6 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",14.53323181,1350.729005
+2,8,Vulgaris small,Vulgaris small,22:6 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",20.05342507,1464.957403
+2,9,Ice,Ice,22:6 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",10.54521452,684.0302645
+1,10,East,East,22:6 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",13.24179606,528.3131825
+1,11,Golf,Golf3,22:6 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",14.68624695,760.0966858
+1,12,Vulgaris,Vulgaris3,22:6 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms",15.90823008,2014.659409
+2,6,Vulgaris,Vulgaris1,24:1 w9c,Too ubiquitous/unknown,Too ubiquitous/unknown,4.646114133,2200.485789
+1,12,Vulgaris,Vulgaris3,24:1 w9c,Too ubiquitous/unknown,Too ubiquitous/unknown,0.76845388,2014.659409
