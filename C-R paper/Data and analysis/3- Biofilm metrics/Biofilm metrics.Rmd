@@ -50,4 +50,16 @@ BiofilmAFDMbypond<-BiofilmAFDM_prod_GP %>% group_by(Pond) %>% dplyr::summarise(m
                                                                              
 ```
 
+Export both two files
+1) Biofilm productivity and grazing pressure by sampling station (to merge with pond metrics for the "Biofilm productivity.RMD")
+2) Biofilm productivity and grazing pressure by pond (for 2/3 columns in Table 3)
+
+```{r export files}
+#1
+write.csv(BiofilmAFDM_prod_GP, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/Biofilmmetrics_samplingstation.csv")
+
+#2
+write.csv(BiofilmAFDMbypond, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/partoftable3.csv")
+
+```
 
