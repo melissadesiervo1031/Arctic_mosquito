@@ -1,0 +1,35 @@
+---
+title: "Biofilm productivity"
+author: "Melissa DeSiervo"
+date: "5/6/2019"
+output: html_document
+---
+This is the R code for developing linear modesl to predict Biofilm productivity from 2018 Greenland dataset. 
+
+There are four datasets that go into this code. 2 are raw data files. 1 derived data file comes from the pond metrics.RMD, the last derived data file comes from the Biofilm metrics.RMD
+
+1) Biofilm productivity == Derived dataset from the Biofilm metrics.RMD that calculates biofilm productivity at each sampling station
+2) allpondmetricsbysamplingstation == raw data file (YSI data X 8 ponds X 3 sampling stations X 3 dates)
+3) perimeterearea == raw data file perimeter and area data (8 ponds X 2 dates: pond thaw and after emergence)
+4) temp and thermal sums = derived data file from Pond metrics.RMD that has the avg temps and thermal sums for each pond by date
+
+
+First, upload the data
+```{r Upload data}
+
+#1
+BiofilmproductivitySS <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/Biofilmmetrics_samplingstation.csv")
+
+#2
+allpondmetricsbysamplingstation <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/allpondmetricsbysamplingstation.csv")
+allpondmetricsbysamplingstation$Date <- as.Date(allpondmetricsbysamplingstation$Date, "%m/%d/%Y")
+
+#3
+perimeterarea <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/perimeterandareaponds_2018.csv",header = TRUE)
+perimeterarea$Pond <- as.factor(perimeterarea$Pond)
+perimeterarea$Date <- as.Date(perimeterarea$Date, "%m/%d/%Y")
+
+#4
+tempandthermalsums <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/watertempthermalsums.csv")
+
+```
