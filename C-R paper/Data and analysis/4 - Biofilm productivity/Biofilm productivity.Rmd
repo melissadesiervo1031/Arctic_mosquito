@@ -31,5 +31,102 @@ perimeterarea$Date <- as.Date(perimeterarea$Date, "%m/%d/%Y")
 
 #4
 tempandthermalsums <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/watertempthermalsums.csv")
+tempandthermalsums$Date <- as.Date(tempandthermalsums$Date, "%Y-%m-%d")
+
 
 ```
+
+Install necessary packages
+```{r Upload packages}
+install.packages("dplyr")
+library(dplyr)
+install.packages("splitstackshape")
+library(splitstackshape)
+
+```
+
+
+Pond metrics
+1)subset to get just the last two measurements
+2) average across the last two
+
+```{r pond metrics}
+
+allpondmetricslasttwo<-subset(allpondmetricsbysamplingstation, Instar=="2nd3rd"|Instar=="Pupae")
+
+#2
+pondmetricsSS<-allpondmetricslasttwo %>% group_by(Pond, Sampling.station) %>% dplyr::summarise(meanDepth=mean(Depth, na.rm=TRUE),meanDOC=mean(DOC, na.rm=TRUE), meanNH4=mean(NH4, na.rm=TRUE), meanN03N02=mean(N03N02, na.rm=TRUE), meanlogTotalP=mean(logTotalP, na.rm=TRUE),meanlogConduc=mean(Conduc, na.rm=TRUE), meanDoPerc=mean(DoPerc, na.rm=TRUE), meanpH=mean(pH, na.rm=TRUE), meanFPOM_liter=mean(FPOM_liter, na.rm=TRUE))
+
+pondmetricsSS<-as.data.frame(pondmetricsSS)
+
+```
+
+
+Perimeter and area data
+1)spread to wide format perimeter and area 
+2)Calculate average perimeter, area, and loss
+3) repeat each row three times to match other dataframes by SS (use expand rows from splitstackshape)
+```{r perim and area data}
+#1
+perimeterwide<-perimeterarea %>% select(Pond,Measurement,Perimeter) %>% spread(Measurement,Perimeter)%>% rename(Perimeter_1=Beginning, Perimeter_2=End)
+
+areawide<-perimeterarea %>% select(Pond,Measurement,Area) %>% spread(Measurement,Area)%>% rename(Area_1=Beginning, Area_2=End)
+
+perimandareawide<- perimeterwide %>% left_join(areawide, by=c("Pond"))
+
+#2
+perimandareawide2<-perimandareawide %>% mutate(Perim_avg=(Perimeter_1 + Perimeter_2)/2, Area_avg=(Area_1+Area_2)/2, Perim_loss=abs(Perimeter_2-Perimeter_1), Area_loss=abs(Area_2-Area_1))
+
+#3
+list3 <- rep("3",length(8)) ##make a vector of 3s (number of times to repeat##)
+perimandareawide3 <- cbind(perimandareawide2, as.numeric(list3))
+perimandareaSS<-expandRows(perimandareawide3, count=c(10))
+
+```
+
+
+Temp and thermal sums data
+1) pull out the dates between the 2nd and third sampling date\
+2) By pond: average temperature, pull out max thermal sum 0
+3) repeat each row three times to match other dataframes by SS (use expand rows from splitstackshape)
+```{r temp thermal sums}
+#1
+betweensecondandthird <- tempandthermalsums %>% filter(Pond=="East" & Date>="2018-06-01" & Date<="2018-06-17"|
+  Pond=="Golf" & Date>="2018-06-02" & Date<="2018-06-11"|Pond=="Ice" & Date>="2018-06-04" & Date<="2018-06-12"|
+  Pond=="NoOil" & Date>="2018-05-27" & Date<="2018-06-04"|Pond=="Oil" & Date>="2018-05-13" & Date<="2018-06-05"|
+  Pond=="Vulgaris" & Date>="2018-05-29" & Date<="2018-06-13"|Pond=="Vulgaris.small" & Date>="2018-06-04" & Date<="2018-06-13"|
+  Pond=="Waterfall" & Date>="2018-05-27" & Date<="2018-06-11")
+
+#2
+tempthermalsums23<-betweensecondandthird %>% group_by(Pond) %>% dplyr::summarise(temp23=mean(meantemp,na.rm=TRUE), maxTS0=max(TS0, na.rm=TRUE))
+
+#3
+list3 <- rep("3",length(8)) ##make a vector of 3s (number of times to repeat##)
+tempthermalsums23 <- cbind(tempthermalsums23, as.numeric(list3))
+tempthermalsums23SS<-expandRows(tempthermalsums23, count=c(4))
+tempthermalsums23SS<-as.data.frame(tempthermalsums23SS)
+```
+
+1) SS data merge with temperature data
+2) merge #1 with perimeter and area data
+3) merge #2 with the dependent predictors
+```{r merge independent and dependent predictors}
+#1
+tempthermalsums23SS$Pond = droplevels(tempthermalsums23SS$Pond)
+tempthermalsums23SS$Pond <-as.factor(tempthermalsums23SS$Pond)
+tempthermalsums23SS<-cbind(tempthermalsums23SS, pondmetricsSS$Sampling.station)
+colnames(tempthermalsums23SS)[4] <- 'Sampling.station'
+pondmetricstempSS <- merge(pondmetricsSS,tempthermalsums23SS, by=c("Pond","Sampling.station"), sort=FALSE)
+
+#2
+perimandareaSS<-cbind(perimandareaSS, pondmetricsSS$Sampling.station)
+colnames(perimandareaSS)[10] <- 'Sampling.station'
+
+pondmetricstempareaSS <- merge(pondmetricstempSS,perimandareaSS,by=c("Pond","Sampling.station"), sort=FALSE)
+
+#3
+BiofilmproductivitySS<-BiofilmproductivitySS  %>% rename(Sampling.station=Sampling.Station)
+allvariablesSS <- merge(pondmetricstempSS,BiofilmproductivitySS,by=c("Pond","Sampling.station"), sort=FALSE)
+
+```
+
