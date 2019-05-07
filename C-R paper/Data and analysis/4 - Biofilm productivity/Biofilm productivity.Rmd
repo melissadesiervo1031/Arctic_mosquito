@@ -38,11 +38,10 @@ tempandthermalsums$Date <- as.Date(tempandthermalsums$Date, "%Y-%m-%d")
 
 Install necessary packages
 ```{r Upload packages}
-install.packages("dplyr")
 library(dplyr)
-install.packages("splitstackshape")
 library(splitstackshape)
-
+library(lme4)
+library(MuMIn)
 ```
 
 
@@ -75,12 +74,12 @@ areawide<-perimeterarea %>% select(Pond,Measurement,Area) %>% spread(Measurement
 perimandareawide<- perimeterwide %>% left_join(areawide, by=c("Pond"))
 
 #2
-perimandareawide2<-perimandareawide %>% mutate(Perim_avg=(Perimeter_1 + Perimeter_2)/2, Area_avg=(Area_1+Area_2)/2, Perim_loss=abs(Perimeter_2-Perimeter_1), Area_loss=abs(Area_2-Area_1))
+perimandareawide2<-perimandareawide %>% mutate(Perim_avg=(Perimeter_1 + Perimeter_2)/2, Area_avg=(Area_1+Area_2)/2, Perim_loss=abs(Perimeter_2-Perimeter_1), Area_loss=abs(Area_2-Area_1),  Area_loss_perc=(Area_loss/Area_1)*100)
 
 #3
 list3 <- rep("3",length(8)) ##make a vector of 3s (number of times to repeat##)
 perimandareawide3 <- cbind(perimandareawide2, as.numeric(list3))
-perimandareaSS<-expandRows(perimandareawide3, count=c(10))
+perimandareaSS<-expandRows(perimandareawide3, count=c(11))
 
 ```
 
@@ -120,13 +119,173 @@ pondmetricstempSS <- merge(pondmetricsSS,tempthermalsums23SS, by=c("Pond","Sampl
 
 #2
 perimandareaSS<-cbind(perimandareaSS, pondmetricsSS$Sampling.station)
-colnames(perimandareaSS)[10] <- 'Sampling.station'
+colnames(perimandareaSS)[11] <- 'Sampling.station'
 
 pondmetricstempareaSS <- merge(pondmetricstempSS,perimandareaSS,by=c("Pond","Sampling.station"), sort=FALSE)
 
 #3
+pondmetricstempareaSS$Pond<-plyr::revalue(pondmetricstempareaSS$Pond, c("Vulgaris.small"="Vulgaris small"))
 BiofilmproductivitySS<-BiofilmproductivitySS  %>% rename(Sampling.station=Sampling.Station)
-allvariablesSS <- merge(pondmetricstempSS,BiofilmproductivitySS,by=c("Pond","Sampling.station"), sort=FALSE)
+allvariablesSS1 <- merge(pondmetricstempareaSS,BiofilmproductivitySS,by=c("Pond","Sampling.station"), sort=FALSE)
 
 ```
+
+
+Make a bunch of models to predict biofilm productivity 
+```{r make biofilm productivity models}
+
+allvariablesSS<-allvariablesSS1[!is.na(allvariablesSS1$Prod.ug.cm.day), ]
+
+
+#null#
+Nullmod<-lmer(Prod.ug.cm.day~ (1|Pond), REML=F, data=allvariablesSS)
+
+##univariate models## ##nmote I had to to REM=f to be able to rank with AIC#
+Perim<-lmer(Prod.ug.cm.day~Perim_avg + (1|Pond), REML=F, data=allvariablesSS)
+Area<-lmer(Prod.ug.cm.day~ Area_avg+(1|Pond), REML=F, data=allvariablesSS)
+Area_loss<-lmer(Prod.ug.cm.day~Area_loss_perc+(1|Pond), REML=F, data=allvariablesSS)
+Depth<-lmer(Prod.ug.cm.day~meanDepth+(1|Pond), REML=F, data=allvariablesSS)
+
+FPOM<-lmer(Prod.ug.cm.day~meanFPOM_liter+(1|Pond), REML=F, data=allvariablesSS)
+DOC<-lmer(Prod.ug.cm.day~meanDOC+(1|Pond), REML=F, data=allvariablesSS)
+NH4<-lmer(Prod.ug.cm.day~meanNH4+(1|Pond), REML=F, data=allvariablesSS)
+N03N02<-lmer(Prod.ug.cm.day~meanN03N02+(1|Pond), REML=F, data=allvariablesSS)
+totalP<-lmer(Prod.ug.cm.day~meanlogTotalP+(1|Pond), REML=F, data=allvariablesSS)
+
+Conduct<-lmer(Prod.ug.cm.day~meanlogConduc+(1|Pond), REML=F, data=allvariablesSS)
+DOperc<-lmer(Prod.ug.cm.day~meanDoPerc+(1|Pond), REML=F, data=allvariablesSS)
+pH<-lmer(Prod.ug.cm.day~meanpH+(1|Pond), REML=F, data=allvariablesSS)
+temphobo<-lmer(Prod.ug.cm.day~temp23+(1|Pond), REML=F, data=allvariablesSS)
+maxTS0<-lmer(Prod.ug.cm.day~maxTS0+(1|Pond), REML=F, data=allvariablesSS)
+
+#Full##
+fullunscaled<-lmer(Prod.ug.cm.day~Perim_avg+Area_avg+Area_loss_perc+meanDepth+meanFPOM_liter+meanDOC+meanNH4+meanN03N02+meanlogTotalP+meanlogConduc+meanDoPerc+meanpH+meanpH+temp23+maxTS0+(1|Pond), REML=F, data=allvariablesSS)
+
+```
+
+
+Scale data and repeate process Make a bunch of models to predict biofilm productivity 
+```{r make biofilm productivity models-scaled data}
+
+##subset out just the predictors#
+subsetpredicators<- subset(allvariablesSS1, select =c(Perim_avg,Area_avg,Area_loss_perc,meanDepth,meanDOC,meanNH4,
+meanN03N02,meanlogTotalP,meanlogConduc,meanDoPerc,meanpH,temp23,maxTS0,meanFPOM_liter))
+
+#scale the predictors#
+scaledpredictors<-scale(subsetpredicators)
+
+#merge them back with the dependent variable in a dataframe#
+biofilmdepnames<-subset(BiofilmproductivitySS, select=c("Pond", "Prod.ug.cm.day"))
+allvariablesSSscaled<-cbind(biofilmdepnames, scaledpredictors)
+allvariablesSSscaled<-allvariablesSS[!is.na(allvariablesSS$Prod.ug.cm.day), ]
+
+#null#
+Nullmod2<-lmer(Prod.ug.cm.day~ (1|Pond), REML=F, data=allvariablesSSscaled)
+
+##univariate models## ##nmote I had to to REM=f to be able to rank with AIC#
+Perim2<-lmer(Prod.ug.cm.day~Perim_avg + (1|Pond), REML=F, data=allvariablesSSscaled)
+Area2<-lmer(Prod.ug.cm.day~ Area_avg+(1|Pond), REML=F, data=allvariablesSSscaled)
+Area_loss2<-lmer(Prod.ug.cm.day~Area_loss_perc+(1|Pond), REML=F, data=allvariablesSSscaled)
+Depth2<-lmer(Prod.ug.cm.day~meanDepth+(1|Pond), REML=F, data=allvariablesSSscaled)
+
+FPOM2<-lmer(Prod.ug.cm.day~meanFPOM_liter+(1|Pond), REML=F, data=allvariablesSSscaled)
+DOC2<-lmer(Prod.ug.cm.day~meanDOC+(1|Pond), REML=F, data=allvariablesSSscaled)
+NH42<-lmer(Prod.ug.cm.day~meanNH4+(1|Pond), REML=F, data=allvariablesSSscaled)
+N03N022<-lmer(Prod.ug.cm.day~meanN03N02+(1|Pond), REML=F, data=allvariablesSSscaled)
+totalP2<-lmer(Prod.ug.cm.day~meanlogTotalP+(1|Pond), REML=F, data=allvariablesSSscaled)
+
+Conduct2<-lmer(Prod.ug.cm.day~meanlogConduc+(1|Pond), REML=F, data=allvariablesSSscaled)
+DOperc2<-lmer(Prod.ug.cm.day~meanDoPerc+(1|Pond), REML=F, data=allvariablesSSscaled)
+pH2<-lmer(Prod.ug.cm.day~meanpH+(1|Pond), REML=F, data=allvariablesSSscaled)
+temphobo2<-lmer(Prod.ug.cm.day~temp23+(1|Pond), REML=F, data=allvariablesSSscaled)
+maxTS02<-lmer(Prod.ug.cm.day~maxTS0+(1|Pond), REML=F, data=allvariablesSSscaled)
+
+#Full##
+fullscaled<-lmer(Prod.ug.cm.day~Perim_avg+Area_avg+Area_loss_perc+meanDepth+meanFPOM_liter+meanDOC+meanNH4+meanN03N02+meanlogTotalP+meanlogConduc+meanDoPerc+meanpH+meanpH+temp23+maxTS0+(1|Pond), REML=F, data=allvariablesSSscaled)
+
+```
+
+AIC table function
+```{r AIC table}
+aictable<-function(X,m){
+  #
+  #  This function will create a full model selection table based on AICc.
+  #  
+  #  Inputs:
+  #
+  #  X is the AIC table produced by R by using AIC(model1,model2, ...)
+  #  m is the sample size
+  #
+  #
+  rnames<-row.names(X)
+  AICc<-X$AIC+2*X$df*(X$df+1)/(m-X$df-1)     #small-sample correction
+  logL<-X$df-X$AIC/2                         #Log-likelihood
+  tab<-data.frame(X[,1],logL,AICc)           #Remove AIC column; add logL and AICc
+  colnames(tab)[1]<-c("Params")              #Rename "df" column   
+  row.names(tab)<-rnames
+  tab<-tab[order(tab$AICc),]                 #Sort by ascending AICc value
+  deltaAICc<-tab$AICc-min(tab$AICc)          #Delta AICc
+  weight<-exp(-deltaAICc/2)/sum(exp(-deltaAICc/2))  #Weights
+  cumwt<-weight                              #Column for cumulative weight
+  for(i in 2:dim(X)[1]){                  
+    cumwt[i]<-cumwt[i-1]+cumwt[i]              #Accumulate weight from the top
+  }
+  tab<-data.frame(tab,deltaAICc,weight,cumwt)
+  tab<-round(tab,4)
+  tab
+}
+
+```
+
+AIC tables for univariate models, null, full for scaled and unscaled data 
+This is NOT reported in manuscript
+```{r AIC table for scaled and unscaled data}
+rawaicunscaled<-AIC(Nullmod,Perim,Area,Area_loss,Depth,DOC,NH4,N03N02,totalP,DOperc, Conduct,pH,temphobo, maxTS0, FPOM,fullunscaled)
+nR<-dim(allvariablesSS)[1]  #Sample size 
+aictableunscaled<-aictable(rawaicunscaled,nR)
+
+rawaicscaled<-AIC(Nullmod2,Perim2,Area2,Area_loss2,Depth2,DOC2,NH42,N03N022,totalP2,DOperc2, Conduct2,pH2,temphobo2, maxTS02, FPOM2,fullscaled)
+nR<-dim(allvariablesSSscaled)[1]  #Sample size 
+aictablescaled<-aictable(rawaicscaled,nR)
+
+```
+
+Make more models with 1 to 4 predictors. Then take the best models (AIC <2) and make an averaged model
+1) make a correllation matrix and true/false for ones that are >0.5 correllation
+2) add "na.omin" to the two full models (scaled and unscaled)
+3) dredge function to make all combinations of models for unscaled data, subset the modesl <2
+4) dredge function on the scaled data subset the modesl <2
+5) Make the averaged model. == Table S4(?) in the Manuscript
+
+```{r make more models and average}
+#1
+smat3 <- abs(cor(subsetpredicators)) <= .5 #makes a correllation matrix and to say TRUE every time a value is greater than 0.5##
+smat3[!lower.tri(smat3)] <- NA ##replaces the duplications with NA#
+
+#2
+fullunscaled<-lmer(Prod.ug.cm.day~Perim_avg+Area_avg+Area_loss_perc+meanDepth+meanFPOM_liter+meanDOC+meanNH4+meanN03N02+meanlogTotalP+meanlogConduc+meanDoPerc+meanpH+meanpH+temp23+maxTS0+(1|Pond), REML=F,na.action = "na.fail", data=allvariablesSS)
+
+fullscaled<-lmer(Prod.ug.cm.day~Perim_avg+Area_avg+Area_loss_perc+meanDepth+meanFPOM_liter+meanDOC+meanNH4+meanN03N02+meanlogTotalP+meanlogConduc+meanDoPerc+meanpH+meanpH+temp23+maxTS0+(1|Pond), REML=F,na.action = "na.fail", data=allvariablesSSscaled)
+
+#3
+dredgedmodelsallupto4noscale3 <- dredge(fullunscaled, subset=smat3, m.lim=c(1,4))
+bestmodelsetnoscale3<-subset(dredgedmodelsallupto4noscale3, delta <2) 
+
+#4
+dredgedmodelsallupto4scale3 <- dredge(fullscaled, subset=smat3, m.lim=c(1,4))
+bestmodelsetscale3<-subset(dredgedmodelsallupto4scale3, delta <2) 
+
+#5
+avgmodelnoscale3<-model.avg(bestmodelsetnoscale3)
+avgmodelscale3<-model.avg(bestmodelsetscale3)
+
+```
+
+Calculate the adjusted Ys and make Figure
+```{r Adjusted ys and figure}
+
+```
+
+
+
 
