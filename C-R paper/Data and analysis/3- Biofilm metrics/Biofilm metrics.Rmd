@@ -43,11 +43,31 @@ BiofilmAFDM_prod_GP<-BiofilmAFDM_prod %>% mutate(GP.ug.C.day=as.numeric(CageAFDM
 
 ```
 
+Paired T test Cage vs. No Cage
+```{r Paire T Cage vs No Cage}
+
+t.test(BiofilmAFDM_prod_GP$CageAFDM, BiofilmAFDM_prod_GP$NocageAFDM, paired = TRUE)
+
+```
+
+
+ANOVA for productivity and grazing pressure
+```{r ANOVA producticity GP}
+
+prodmodel<-lm(Prod.ug.cm.day~Pond, data=BiofilmAFDM_prod_GP)
+GPmodel<-lm(GP.ug.C.day~Pond, data=BiofilmAFDM_prod_GP)
+
+anova(prodmodel)
+anova(GPmodel)
+```
+
+
 Now calculate averages and standard error by pond
 ```{r Calculate grazing pressure}
 
 BiofilmAFDMbypond<-BiofilmAFDM_prod_GP %>% group_by(Pond) %>% dplyr::summarise(meanProd.ug.cm.day=mean(Prod.ug.cm.day,na.rm=TRUE),seProd.ug.cm.day=sd(Prod.ug.cm.day,na.rm=TRUE),meanProd.mg.dm.day=mean(Prod.mg.dm.day,na.rm=TRUE),seProd.mg.dm.day=(sd(Prod.mg.dm.day,na.rm=TRUE)/sqrt(n())),meanProd.ug.dm.day=mean(Prod.ug.dm.day,na.rm=TRUE),seProd.ug.dm.day=(sd(Prod.ug.dm.day,na.rm=TRUE)/sqrt(n())),meanGP.ug.C.day=mean(GP.ug.C.day,na.rm=TRUE),seGP.ug.cm.day=(sd(GP.ug.C.day,na.rm=TRUE)/sqrt(n())),meanGP.mg.dm.day=mean(GP.mg.dm.day,na.rm=TRUE),seGP.mg.dm.day=(sd(GP.mg.dm.day,na.rm=TRUE)/sqrt(n())),meanGP.ug.dm.day=mean(GP.ug.dm.day,na.rm=TRUE),seGP.ug.dm.day=(sd(GP.ug.dm.day, na.rm=TRUE)/sqrt(n())))
-                                                                             
+
+
 ```
 
 Export both two files
