@@ -1,0 +1,19 @@
+"Fine particular organic matter (FPOM) from water collected in 8 ponds, at three time points, in three locations within the pond",
+,
+"Biomass of AFDM calculated by filtering pond water onto a Whatman 0.8um Glass fiber filter, weighing, burning and weighing the samples",
+,
+,
+,
+,
+Filter,Filter ID
+Date,Date filter was collected
+Pond,Pond 
+Instar,Sampling date (at 3 different instar stages)
+ Sampling station,location within pond
+Volume filtered,Volume of water filtered
+Notes,Notes
+Filterweight,Weight of the filter
+Weight before burn,Weight of filter w/ FPOM
+Weightafterburn,Weight of filter after burn
+AFDM,AFDM (before burn - after burn)
+AFDM_adjust,AFDM divided by the volume of water sampeled
