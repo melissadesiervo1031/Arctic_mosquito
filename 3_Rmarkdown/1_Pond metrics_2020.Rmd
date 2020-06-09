@@ -18,31 +18,46 @@ The 3 input data files for this set of analyses are as follows
 
 ```{r Upload data and fix date formats}
 
-allpondmetricsbysamplingstation <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/allpondmetricsbysamplingstation.csv")
+
+library (readr)
+
+
+allpondmetricsbysamplingstation<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/allpondmetricsbysamplingstation.csv?token=AL4COXLXLGM66NHYLYB52JK633VTY"))
+
+allpondmetricsbysamplingstation<-as.data.frame(allpondmetricsbysamplingstation)
+
 allpondmetricsbysamplingstation$Date <- as.Date(allpondmetricsbysamplingstation$Date, "%m/%d/%Y")
 
-Ponds2018Temp2<-read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/Allponds2018andairport_Temp.csv", header = TRUE)  # read csv file 
+
+Ponds2018Temp2<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/Allponds2018andairport_Temp.csv?token=AL4COXP6EK25QFTLZ4WR5HC633XRI"))
+
+
+Ponds2018Temp2<-as.data.frame(Ponds2018Temp2)
+
 Ponds2018Temp2$DateTime<-as.POSIXct(Ponds2018Temp2$DateTime, format = "%m/%d/%Y %H:%M") ##dateformatfordate_time_start##
 Ponds2018Temp2$Date <- as.Date(Ponds2018Temp2$Date, "%m/%d/%Y")
 
-perimeterarea <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/perimeterandareaponds_2018.csv",header = TRUE)
+
+perimeterarea<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/perimeterandareaponds_2018.csv?token=AL4COXJXOJODNODLCNRBKZS633XYU"))
+
+perimeterarea<-as.data.frame(perimeterarea)
+
 perimeterarea$Pond <- as.factor(perimeterarea$Pond)
 perimeterarea$Date <- as.Date(perimeterarea$Date, "%m/%d/%Y")
+
 ```
 
 Install necessary packages
 ```{r Upload packages}
-install.packages("dplyr")
+
 library(dplyr)
-install.packages("lme4")
 library(lme4)
-install.packages("chillR")
 library(chillR)
-install.packages("tidyr")
 library(tidyr)
 ```
 
 For the pond variables where I have sampling station within pond, summarize means and stdev by pond and date 
+
 ```{r summarize by pond and date}
 abioticsummarybypondanddate<-allpondmetricsbysamplingstation %>% group_by(Pond, Date) %>% dplyr::summarise(meanDepth=mean(Depth, na.rm=TRUE),sdDepth=sd(Depth, na.rm=TRUE),seDepth=sd(Depth, na.rm=TRUE)/sqrt(n()), meanDOC=mean(DOC, na.rm=TRUE),sdDOC=sd(DOC, na.rm=TRUE), seDOC=sd(DOC, na.rm=TRUE)/sqrt(n()), meanNH4=mean(NH4, na.rm=TRUE),sdNH4=sd(NH4, na.rm=TRUE), seNH4=sd(NH4, na.rm=TRUE)/sqrt(n()), meanN03N02=mean(N03N02, na.rm=TRUE),sdN03N02=sd(N03N02, na.rm=TRUE),seN03N02=sd(N03N02, na.rm=TRUE)/sqrt(n()), meanTotalP=mean(TotalP, na.rm=TRUE),sdTotalP=sd(TotalP, na.rm=TRUE),seTotalP=sd(TotalP, na.rm=TRUE)/sqrt(n()),meanConduc=mean(Conduc, na.rm=TRUE),sdConduc=sd(Conduc, na.rm=TRUE),seConduc=sd(Conduc, na.rm=TRUE)/sqrt(n()), meanDoPerc=mean(DoPerc, na.rm=TRUE),sdDoPerc=sd(DoPerc, na.rm=TRUE),seDoPerc=sd(DoPerc, na.rm=TRUE)/sqrt(n()), meanpH=mean(pH, na.rm=TRUE),sdpH=sd(pH, na.rm=TRUE),sepH=sd(pH, na.rm=TRUE)/sqrt(n()), meanFPOM_liter=mean(FPOM_liter, na.rm=TRUE),sdFPOM_liter=sd(FPOM_liter, na.rm=TRUE),seFPOM_liter=sd(FPOM_liter, na.rm=TRUE)/sqrt(n()))
 
@@ -137,15 +152,6 @@ Ponddates$Pond<-plyr::revalue(Ponddates$Pond, c("Vulgaris small"="Vulgaris.small
 thermalsumsatdates<-Ponddates %>% left_join(tempandthermalsums, by=c("Date","Pond"))%>% select(Pond, Date, TS0)%>% arrange(Pond, Date)
 ```
 
-export the temp and thermal sums for all dates
-
-```{r export tempthermalsum}
-
-write.csv(tempandthermalsums, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/watertempthermalsums.csv")
-
-```
-
-
 
 Next, pull out the relevant temperatures 
 1) Pull out the avg temp from the first day of sampling
@@ -203,18 +209,6 @@ abioticsummarybypondanddate3<- abioticsummarybypondanddate2 %>% left_join(therma
 
 ```
 
-Merge with the perimeter and area
-export into .csv that makes Table 1
-
-```{r export Table 1}
-
-abioticsummarybypondanddate4<- merge(abioticsummarybypondanddate3, perimeterarea, by =c("Pond", "Date"), all.x=TRUE, all.y=TRUE)
-
-abioticsummarybypondanddate5<-abioticsummarybypondanddate4[,c(1,2,23,24,3,4,21,22,19,20,5,6,7:12,17,18,13:16)] #change order of columns#
-
-write.csv(abioticsummarybypondanddate5, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/table1.csv")
-
-```
 
 Reorganize data to make correllations
 1)spread to wide format perimeter and area 
@@ -252,7 +246,6 @@ abioticsummarybypond$Pond<-plyr::revalue(abioticsummarybypond$Pond, c("Vulgaris 
 abioticandperimarea<- abioticsummarybypond %>% left_join(perimandareawide2, by=c("Pond"))
 allabiotic<-abioticandperimarea %>% left_join(avgtempbypond, by=c("Pond"))
 
-###this isn't going to work right anymore because I added an extra column 6/23/19##
 #6
 allabiotic2 <- allabiotic[ -c(11:14,17)]
 allabiotic2<-allabiotic2[,c(1, 11:13,2,14,10,3:6,9,7,8)] #change order of columns#
@@ -261,14 +254,7 @@ allabiotic2<-allabiotic2[,c(1, 11:13,2,14,10,3:6,9,7,8)] #change order of column
 subsetpredicators<- allabiotic2[-1]
 correllationspondlevel<-correllations<-round(cor(subsetpredicators, use = "pairwise.complete.obs"),2)
 
-write.csv(allabiotic, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/abioticbypond.csv")
 ```
 
-Export table S2
-```{r export Table S21}
-
-write.csv(correllationspondlevel, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/tableS2.csv")
-
-```
 
 ```
