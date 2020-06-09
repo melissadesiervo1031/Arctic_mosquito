@@ -1,0 +1,69 @@
+Fattyacid,Biomarker1,Biomarker2
+12:00,Too ubiquitous/unknown,Too ubiquitous/unknown
+13:00,Bacteria,Bacteria
+14:00,Too ubiquitous/unknown,Too ubiquitous/unknown
+15:00,Bacteria,Bacteria
+16:00,Too ubiquitous/unknown,Too ubiquitous/unknown
+17:00,Bacteria,Bacteria
+18:00,Bacteria,Bacteria
+20:00,Too ubiquitous/unknown,Too ubiquitous/unknown
+22:00,Vascular plant detritus,Vascular plant detritus
+23:00,Vascular plant detritus,Vascular plant detritus
+24:00:00,Vascular plant detritus,Vascular plant detritus
+10:0 2OH,Bacteria,Bacteria
+13:0 iso,Bacteria,Bacteria
+14:0 iso,Bacteria,Bacteria
+14:1 w5c,Bacteria,Bacteria
+14:1 w7c,Too ubiquitous/unknown,Too ubiquitous/unknown
+15:0 anteiso,Bacteria,Bacteria
+15:0 iso,Bacteria,Bacteria
+15:1 anteiso w9c,Bacteria,Bacteria
+15:1 iso w6c,Bacteria,Bacteria
+15:1 w5c,Bacteria,Bacteria
+15:1 w6c,Bacteria,Bacteria
+15:1 w9c,Bacteria,Bacteria
+16:0 10-methyl,Bacteria,Bacteria
+16:0 anteiso,Bacteria,Bacteria
+16:0 iso,Bacteria,Bacteria
+16:1 w3c,Too ubiquitous/unknown,Too ubiquitous/unknown
+16:1 w5c,Bacteria,Bacteria
+16:1 w7c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+16:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+17:0 10-methyl,Bacteria,Bacteria
+17:0 anteiso,Bacteria,Bacteria
+17:0 cyclo w7c,Bacteria,Bacteria
+17:0 iso,Bacteria,Bacteria
+17:1 anteiso w9c,Bacteria,Bacteria
+17:1 iso w9c,Bacteria,Bacteria
+17:1 w6c,Bacteria,Bacteria
+17:1 w8c,Bacteria,Bacteria
+17:1 iso w10c,Bacteria,Bacteria
+18:0 10-methyl,Bacteria,Bacteria
+18:0 iso,Bacteria,Bacteria
+18:1 w5c,Bacteria,Bacteria
+18:1 w7c,"Algae, cyanobacteria, diatoms",Bacteria
+18:1 w7c 10-methyl,Bacteria,Bacteria
+18:1 w8c,Bacteria,Bacteria
+18:1 w9c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+18:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+18:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+18:4 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+19:0 cyclo w7c,Bacteria,Bacteria
+19:1 w7c 10-methyl,Bacteria,Bacteria
+19:1 w8c,Bacteria,Bacteria
+19:3 w6c,Too ubiquitous/unknown,Too ubiquitous/unknown
+20:0 iso,Bacteria,Bacteria
+20:1 w8c,Too ubiquitous/unknown,Too ubiquitous/unknown
+20:1 w9c,Bacteria,Bacteria
+20:2 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+20:3 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+20:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+20:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+21:1 w9c,Too ubiquitous/unknown,Too ubiquitous/unknown
+22:1 w6c,Too ubiquitous/unknown,Too ubiquitous/unknown
+22:1 w9c,Bacteria,Bacteria
+22:4 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+22:5 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+22:5 w6c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+22:6 w3c,"Algae, cyanobacteria, diatoms","Algae, cyanobacteria, diatoms"
+24:1 w9c,Too ubiquitous/unknown,Too ubiquitous/unknown

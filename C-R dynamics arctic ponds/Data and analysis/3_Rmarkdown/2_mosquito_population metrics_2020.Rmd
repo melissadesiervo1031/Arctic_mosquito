@@ -1,0 +1,304 @@
+---
+title: "Mosquito and beetle metrics"
+author: "Melissa DeSiervo"
+date: "5/10/2019"
+output: html_document
+---
+This is the R code for calculating mosquito, beetle, and other invert population metrics from 2018 Greenland dataset. 
+
+The main file that is imported here (invertcountsperimemerg2018.csv) is appended from 3 raw data files
+1)/Raw data/Invertebrate counts/invertcounts2018 == this has the raw data from the scoop samples
+2)/Raw data/Invertebrate counts/datesemergence == has the dates where larvae were still hatching OR began emerging
+3) /Raw data/Perimeter and area/perimeter_area ponds 10_30_2018 == has the initial and final perimeters, as well as the estimated perimeter at each date, which was calculated by assuming ponds shrank by the same amount every time. There is one exception (Waterfall) where we have a midpoint measurement. 
+4) wing length and egg counts for dissected females from 2012 and 2017
+
+
+```{r Upload data and fix date formats}
+#1
+
+invertcounts2018<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/invertcountsperimemerg2018.csv?token=AL4COXNPKXIYY4L7QL2SHES6333U6"))
+
+invertcounts2018<-as.data.frame(invertcounts2018)
+invertcounts2018$Date <- as.Date(invertcounts2018$Date, "%m/%d/%Y")
+
+#2
+emergencetraps<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/Emergence_number_2018.csv?token=AL4COXNNSSKUFGDUPRRNRVC6332GW"))
+
+emergencetraps<-as.data.frame(emergencetraps)
+
+emergencetraps$Start.date <- as.Date(emergencetraps$Start.date, "%m/%d/%Y")
+emergencetraps$Date.collected <- as.Date(emergencetraps$Date.collected, "%m/%d/%Y")
+
+#3
+emergencesize<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/Emertrap_size_2018.csv?token=AL4COXKAMZIFR63TIN554XC6332WQ"))
+emergencesize<-as.data.frame(emergencesize)
+emergencesize$Date <- as.Date(emergencesize$Date, "%m/%d/%Y")
+
+#4
+eggcount<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/20122017eggs.csv?token=AL4COXNNSHGUMFEXTUPKBOS6333A6"))
+eggcount<-as.data.frame(eggcount)
+
+
+```
+
+
+Install necessary packages
+```{r Upload packages}
+library(dplyr)
+library(tidyr)
+library(lme4)
+library(ggplot2)
+library(scales)
+library(gridExtra)
+```
+
+1) Select the mosquito total and beetle columns and get in units of liters, and log transform
+2) Summarize by date
+3) subset out the dates before emergence
+
+```{r mosquito N0 density}
+
+#1
+
+### 350ml * 5 = 1.75L##
+invertcounts20182<-invertcounts2018 %>% select(Date, Site, Pond2, Total, Colymlarv, PondPerimeter:Larvalstage2) %>% mutate(Totalliter = Total/1.75, Colyliter=Colymlarv/1.75)%>% mutate(logTotalliter = log(Totalliter+1), logColyliter=log(Colyliter+1))
+
+#2
+summarydensitybyliter<-invertcounts20182 %>% group_by(Site, Pond2, Date,Emergence, Larvalstage2, PondPerimeter, Depth_1, Length_1.5) %>% dplyr::summarise(n=n(), meanTotalliter=mean(Totalliter, na.rm=TRUE),sdTotalliter=sd(Totalliter, na.rm=TRUE),seTotalliter=(sdTotalliter/sqrt(n)), meanbeetleTotalliter=mean(Colyliter, na.rm=TRUE),sdbeetleliter=sd(Colyliter, na.rm=TRUE),meanlogTotalliter=mean(logTotalliter, na.rm=TRUE),sdlogTotalliter=sd(logTotalliter, na.rm=TRUE), selogTotalliter=(sdlogTotalliter/sqrt(n)),meanlogbeetleTotalliter=mean(logColyliter, na.rm=TRUE),sdlogbeetleliter=sd(logColyliter, na.rm=TRUE))
+
+summaryN0density_1<-subset(summarydensitybyliter, Larvalstage2=="N0")  
+summaryN0density<-summaryN0density_1 %>% ungroup()%>% select(c(Site, Pond2, Date, meanTotalliter, seTotalliter,  meanlogTotalliter, selogTotalliter))
+
+#3
+summarydensitybeforeemergence<-subset(summarydensitybyliter, Emergence=="Before")
+
+
+```
+
+1) summarize the means by sample (instead of liters as above)
+2) Add a column to calculate total littoral area (perimeter (XXXm) X depth (0.2m) X zone I sampeled (1.5m) X 1000 to convert from cubic meters to liters)
+3) Calculate the total area sampeled and the finite population correction (Cochran 1966)
+4) Calculate total population size and standard errors according to (Cochran 1966)
+5) subset out the dates before emergence = Data for Figure 3
+6) subset out N0 == Column 2 in Table 3
+7) subset out last date before emergence   
+```{r calculate total population size}
+
+#1
+summarydensitybysample<-invertcounts2018 %>% group_by(Site, Pond2, Date,Emergence, Larvalstage2, PondPerimeter, Depth_1, Length_1.5) %>% dplyr::summarise(samplemean=mean(Total, na.rm=TRUE),samplevar=var(Total, na.rm=TRUE), samplemeanbeetle=mean(Colymlarv, na.rm=TRUE),samplevarbeetles=var(Colymlarv, na.rm=TRUE),n=n())
+
+#2
+summarydensitybysample2<- summarydensitybysample %>% mutate(Littoralarea_liters=PondPerimeter*Depth_1*Length_1.5*1000)
+
+#3
+summarydensitybysample3<-as.data.frame(summarydensitybysample2) %>% mutate(N=Littoralarea_liters/1.75, finitepopcorrection=((N-n)/N))
+
+#4
+totalpopulationbydate<-summarydensitybysample3 %>% mutate(Totalpop=samplemean*N, variancepop=(((N^2)*samplevar)/n)*finitepopcorrection, VMR=(variancepop/Totalpop), SEpop=((N*(sqrt(samplevar))/sqrt(n))*sqrt(finitepopcorrection)), lnTotalpop=log(1+Totalpop), logupperSE=log10(Totalpop+SEpop),loglowerSE=log10(Totalpop-SEpop),logTotalpop=log10(1+Totalpop), lnupperSE=log(Totalpop+SEpop),lnlowerSE=log(Totalpop-SEpop),Totalpopbeetles=samplemeanbeetle*N,SEpopbeetles=((N*(sqrt(samplevarbeetles))/sqrt(n))*sqrt(finitepopcorrection)),lnTotalpopbeetles=log(1+(samplemeanbeetle*N)),logTotalpopbeetles=log10(1+(samplemeanbeetle*N)), lnupperSEbeetles=log(1+(Totalpopbeetles+SEpopbeetles)),lnlowerSEbeetles=log((1+Totalpopbeetles-SEpopbeetles)),logupperSEbeetles=log10(1+(Totalpopbeetles+SEpopbeetles)),loglowerSEbeetles=log10((1+Totalpopbeetles-SEpopbeetles)))
+
+#5
+totalpopbeforeemergence<-subset(totalpopulationbydate, Emergence=="Before")
+
+#6
+totalpopN0_1<-subset(totalpopbeforeemergence, Larvalstage2=="N0") 
+totalpopN0<-totalpopN0_1%>% select(Site, Date, Totalpop, SEpop)%>% mutate(TotalpopX1000=Totalpop/1000, SEX1000=SEpop/1000)
+
+#7
+lastdate<-totalpopbeforeemergence %>% group_by(Site) %>% filter(Date==max(Date))%>% select(Site, Pond2, Date, Totalpop, SEpop)
+
+```
+
+
+Calculate per capita mortality
+1) For total abundance Coefficients for "Date"  == Column in Table 2
+2) For density
+```{r calculate mortality for each pond}
+#1
+fitsabundance <- lmList(lnTotalpop ~ Date | Site, data=totalpopbeforeemergence)
+
+#2
+fitsdensity <- lmList(meanlogTotalliter ~ Date | Site, data=summarydensitybeforeemergence)
+
+fitsabundacedf <- data.frame(Site=rownames(coef(fitsabundance)),coef(fitsabundance),check.names=FALSE)
+rownames(fitsabundacedf) <- NULL
+
+fitsdensity <- data.frame(Site=rownames(coef(fitsdensity)),coef(fitsdensity),check.names=FALSE)
+rownames(fitsdensity) <- NULL
+
+```
+
+
+
+
+```{r emergence trap cumulative averages}
+#take cumulative sum by emergence trap, but leave the NAs as is
+
+emergencetrapcumulative<-emergencetraps  %>% group_by(Pond, SS)%>% arrange(Pond, SS, Date.collected)%>% dplyr::mutate(cumemerg=(ifelse(is.na(Total), NA , cumsum(Total))),logTotal=log(1+Total), logcumemerg=(log(1+cumemerg)), cumnumdays=cumsum(numdays))
+
+##make the NAs be the average by date##
+emergencetrapcumulative2<-emergencetrapcumulative %>% group_by(Pond,Date.collected) %>% mutate(Total2=replace(Total, is.na(Total), mean(Total, na.rm=TRUE)),logTotal2=log(1+Total2))
+
+emergencetrapcumulative3<-emergencetrapcumulative2  %>% group_by(Pond, SS)%>% arrange(Pond, SS, Date.collected)%>% dplyr::mutate(cumemerg2=cumsum(Total2),logcumemerg2=log(1+cumemerg2))
+
+emergencebysamplingstation<-emergencetrapcumulative3 %>% group_by(Pond, SS) %>% filter(Date.collected==max(Date.collected))
+
+emergmodel<-lm(log(cumemerg)~Pond, data=emergencebysamplingstation)
+
+###
+emergencencebydate<-emergencetrapcumulative3 %>% group_by(Pond, Date.collected) %>% dplyr::summarise(meancumemerg=mean(cumemerg2, na.rm=TRUE), Stdevcumemerg=sd(cumemerg, na.rm=TRUE), Sterrorcumemerg=(sd(cumemerg, na.rm=TRUE)/sqrt(n())),logmeancumemerg=mean(logcumemerg2, na.rm=TRUE), logStdevcumemerg=sd(logcumemerg, na.rm=TRUE), logSterrorcumemerg=(sd(logcumemerg, na.rm=TRUE)/sqrt(n())))
+
+totalemergencebydate<-emergencencebydate%>% group_by(Pond) %>% filter(meancumemerg==max(meancumemerg))%>% select(c(Pond, meancumemerg,Sterrorcumemerg, logmeancumemerg, logSterrorcumemerg))
+
+```
+
+
+
+```{r emergence trap sex ratios}
+
+##same as above but by sex##
+
+#take cumulative sum by emergence trap, but leave the NAs as is
+
+emergencetrapcumsex<-emergencetraps  %>% group_by(Pond, SS)%>% arrange(Pond, SS, Date.collected)%>% dplyr::mutate(cumemergmale=(ifelse(is.na(male), NA , cumsum(male))), cumemergfemale=(ifelse(is.na(female), NA , cumsum(female))), cumnumdays=cumsum(numdays))
+
+##make the NAs be the average by date##
+emergencetrapcumsex2<-emergencetrapcumsex %>% group_by(Pond,Date.collected) %>% mutate(male2=replace(male, is.na(male), mean(male, na.rm=TRUE)),female2=replace(female, is.na(female), mean(female, na.rm=TRUE)) )
+
+emergencetrapcumsex3<-emergencetrapcumsex2  %>% group_by(Pond, SS)%>% arrange(Pond, SS, Date.collected)%>% dplyr::mutate(cumemergmale2=cumsum(male2),cumemergfemale2=cumsum(female2))
+
+emergencebysamplingstationsex<-emergencetrapcumsex3 %>% group_by(Pond, SS) %>% filter(Date.collected==max(Date.collected)) %>% mutate(sexratio=cumemergmale2/cumemergfemale2)
+
+```
+
+
+AIC table function
+```{r AIC table function}
+
+aictable<-function(X,m){
+  #
+  #  This function will create a full model selection table based on AICc.
+  #  
+  #  Inputs:
+  #
+  #  X is the AIC table produced by R by using AIC(model1,model2, ...)
+  #  m is the sample size
+  #
+  #
+  rnames<-row.names(X)
+  AICc<-X$AIC+2*X$df*(X$df+1)/(m-X$df-1)     #small-sample correction
+  logL<-X$df-X$AIC/2                         #Log-likelihood
+  tab<-data.frame(X[,1],logL,AICc)           #Remove AIC column; add logL and AICc
+  colnames(tab)[1]<-c("Params")              #Rename "df" column   
+  row.names(tab)<-rnames
+  tab<-tab[order(tab$AICc),]                 #Sort by ascending AICc value
+  deltaAICc<-tab$AICc-min(tab$AICc)          #Delta AICc
+  weight<-exp(-deltaAICc/2)/sum(exp(-deltaAICc/2))  #Weights
+  cumwt<-weight                              #Column for cumulative weight
+  for(i in 2:dim(X)[1]){                  
+    cumwt[i]<-cumwt[i-1]+cumwt[i]              #Accumulate weight from the top
+  }
+  tab<-data.frame(tab,deltaAICc,weight,cumwt)
+  tab<-round(tab,4)
+  tab
+}
+
+```
+
+
+
+Wing length fecundtiy power function == Figure supplemental 1
+```{r power function wing egg}
+
+eggcount$Date<-as.Date(eggcount$Date, format = "%m/%d/%Y") ##dateformat##
+eggcount$Year<-as.factor(eggcount$Year)
+
+
+#fit linear and power function and compare with AIC###
+
+eggcount2012<-subset(eggcount, Year=="2012")
+eggcount2017<-subset(eggcount, Year=="2017")
+
+
+wingtoegglinear <- lm(Eggs ~ Winglength, data = eggcount)
+wingtoeggpower<- nls(Eggs ~ a * Winglength^b, data = eggcount, start = list(a=1, b=1))
+wingtoeggexplin<-lm(log(Eggs)~Winglength, data=eggcount)
+wingtoeggpowerlin<-lm(log(Eggs)~log(Winglength), data=eggcount)
+
+##int = exp(1.621), power = 1.645##
+# power equation = 5.06 * W^1.645##
+
+rawaic<-AIC(wingtoegglinear, wingtoeggpower, wingtoeggexplin, wingtoeggpowerlin)
+nR<-dim(eggcount)[1]  #Sample size 
+aictable(rawaic,nR)
+
+```
+
+
+
+
+
+Average size/potential fecundity by pond == size in Table 3
+```{r Average size potential fecundity}
+
+## add column for egg##
+emergencesize_2<-emergencesize %>% mutate(eggs=5.06*Winglength2^1.645) ###this power function comes from a more 
+
+# power equation = 5.06 * W^1.645##
+
+
+##complete dataset##
+
+##subset females only##
+emergencesize_2femalesonly<-subset(emergencesize_2, Sex=="F")
+
+summaryemergencesize<-emergencesize_2femalesonly %>% group_by(Site) %>% dplyr::summarise(Winglength=mean(Winglength2, na.rm=TRUE), varwing=var(Winglength2, na.rm=TRUE), Stdevwing=sd(Winglength2, na.rm=TRUE), Sterrorwing=(sd(Winglength2, na.rm=TRUE)/sqrt(n())),coefvar=(Stdevwing/Winglength), meaneggs=mean(eggs, na.rm=TRUE), vareggs=var(eggs, na.rm=TRUE), Stdeveggs=sd(eggs, na.rm=TRUE), Sterroreggs=(sd(eggs, na.rm=TRUE)/sqrt(n())))
+
+```
+
+1) pull together data
+
+```{r calculate lambda and Larvae next year}
+
+numberdays2<- data.frame("Site" = c("East", "Golf", "Ice", "NoOil", "Oil", "Vulgaris", "Vulgaris small", "Waterfall"), "numdays" = c(21, 18, 22, 16, 20, 18, 19,23))
+
+
+DensityabundanceN0<-summaryN0density %>% right_join(totalpopN0, by=c("Site", "Date"))
+
+DAN0mort<-DensityabundanceN0 %>% right_join(fitsabundacedf, by=c("Site")) %>% select(c(Site, Pond2,Date.x, meanTotalliter, seTotalliter, Totalpop, SEpop, mortality = Date.y))
+
+DAN0mort_2<-DAN0mort%>% right_join(numberdays2, by=c("Site"))%>% mutate(numdays2=as.numeric(numdays))
+
+DAN0mortsize<-DAN0mort_2 %>% right_join(summaryemergencesize, by=c("Site")) %>% select(c(Site, Pond2, Date.x, meanTotalliter, seTotalliter, Totalpop, SEpop, mortality, numdays2, Winglength, Sterrorwing, coefvar, meaneggs,Sterroreggs))
+
+DAN0mortsizenumberemerg<-DAN0mortsize %>% merge(totalemergencebydate, by.x=c("Site"), by.y=c("Pond"))
+
+###Calculate lambda ##
+
+Survadult<-0.9 ##survival from pupae to adult##
+Propfemale<-0.5 ##proportion that are female##
+ProbBM<-0.17 ##probability of a blood meal##
+Survegginstar<-0.625 ## probability of egg to first instar, calculated so that average lambda = 1
+
+
+Mozpopmetrics<-DAN0mortsizenumberemerg %>% mutate(Lambdatotalpop=(exp(mortality*numdays2))*Survadult*Propfemale*meaneggs*ProbBM*Survegginstar, Nt1=meanTotalliter*Lambdatotalpop)
+
+```
+
+
+```{r final dataframe beetle metrics}
+
+summarydensitybyliter<-invertcounts20182 %>% group_by(Site, Date,Emergence, Larvalstage2, PondPerimeter, Depth_1, Length_1.5) %>% dplyr::summarise(n=n(), meanTotalliter=mean(Totalliter, na.rm=TRUE),sdTotalliter=sd(Totalliter, na.rm=TRUE),seTotalliter=(sdTotalliter/sqrt(n)), meanbeetleTotalliter=mean(Colyliter, na.rm=TRUE),sdbeetleliter=sd(Colyliter, na.rm=TRUE),sebeetleTotalliter=(sdbeetleliter/sqrt(n)), meanlogTotalliter=mean(logTotalliter, na.rm=TRUE),sdlogTotalliter=sd(logTotalliter, na.rm=TRUE), selogTotalliter=(sdlogTotalliter/sqrt(n)),meanlogbeetleTotalliter=mean(logColyliter, na.rm=TRUE),sdlogbeetleliter=sd(logColyliter, na.rm=TRUE),selogbeetleliter=sdlogbeetleliter/sqrt(n), na.rm=TRUE)
+
+summarydensitybeforeemergence<-subset(summarydensitybyliter, Emergence=="Before")
+
+beetledensity<-summarydensitybeforeemergence%>% group_by(Site) %>% filter(meanbeetleTotalliter==max(meanbeetleTotalliter))%>% select(c(Site, meanbeetleTotalliter,sebeetleTotalliter,meanlogbeetleTotalliter, selogbeetleliter))
+
+totalpopbeforeemergence<-subset(totalpopulationbydate, Emergence=="Before")
+
+beetletotalpop<-totalpopbeforeemergence%>% group_by(Site) %>% filter(Totalpopbeetles==max(Totalpopbeetles))%>% select(c(Site, Totalpopbeetles,SEpopbeetles,lnTotalpopbeetles, lnupperSEbeetles,lnlowerSEbeetles))
+
+beetlemetrics<- beetledensity %>% right_join(beetletotalpop, by=c("Site"))
+
+
+```
+

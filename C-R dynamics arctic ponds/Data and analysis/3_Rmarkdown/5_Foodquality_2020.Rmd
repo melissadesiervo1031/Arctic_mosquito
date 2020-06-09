@@ -1,0 +1,263 @@
+---
+title: "BiofilmQuality"
+author: "Melissa DeSiervo"
+date: "5/28/2019"
+output: html_document
+---
+
+This is the R code for assessing food quality of biofilms for the Greenland 2018 dataset. 
+
+The data are from several raw files
+
+1= CN ratio of biofilm from lab analysis
+2= The fatty acid biomass from biofilm samples (from PLFA analysis)
+3= Fatty acids categorized by biomarkers (as determined by literature)
+
+And one derived file (from the Pond metrics RMD)
+
+
+First, upload the data
+```{r Upload data}
+
+#1
+
+CNratiodetritus <-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/CNdetritus.csv?token=AL4COXLWQUTBGUQNPPADDNS634FXW"))
+
+CNratiodetritus <-as.data.frame(CNratiodetritus )
+
+#2 
+Fattyacids <-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/Fattyacids_raw.csv?token=AL4COXLUD6VM74U3LVOS5CC634FV2"))
+
+Fattyacids <-as.data.frame(Fattyacids)
+
+
+#3 
+Biomarkers <-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/Fattyacids_biomarker.csv?token=AL4COXL7ZAQKUZ2QAHBZRR2634FUA"))
+
+Biomarkers <-as.data.frame(Biomarkers)
+
+
+#4 
+Foodexperiment <-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/Foodexperiment_2018.csv?token=AL4COXNBEKMWH2TJ24XNCAK634FZ2"))
+
+Foodexperiment <-as.data.frame(Foodexperiment)
+
+#5
+pondmetrics <-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/4_Outputs/abioticbypond.csv?token=AL4COXJW4AEO3GXCTITGG2S634FOQ"))
+
+pondmetrics <-as.data.frame(pondmetrics)
+
+```
+
+
+packages
+```{r Upload packages}
+
+library(dplyr)
+library(MuMIn)
+library(ggplot2)
+library(plyr)
+library(tidyr)
+
+```
+
+
+
+ANOVA tests size, % N
+```{r Calculate by pond}
+
+hist(CNratiodetritus$Npercent)
+
+Npercentm1<-lm(Npercent~Pond, data=CNratiodetritus)
+
+
+Foodexperiment1<-subset(Foodexperiment, Treatment=="DET1")
+
+hist(Foodexperiment1$Winglenth)
+
+Winglengthtm1<-lm(Winglenth~Pond, data=Foodexperiment1)
+dayspupm2<-lm(dayspup~Pond, data=Foodexperiment1)
+
+
+```
+
+
+
+
+
+Averages and standard error by pond
+```{r Calculate by pond}
+
+CNratiobypond<-CNratiodetritus%>% group_by(Pond, Pond2) %>% dplyr::summarise(meanN=mean(Nmg,na.rm=TRUE),seN=(sd(Nmg,na.rm=TRUE)/sqrt(n())),meanNper=mean(Npercent,na.rm=TRUE),seNper=(sd(Npercent,na.rm=TRUE)/sqrt(n())), meanCper=mean(Cpercent,na.rm=TRUE),seCper=(sd(Cpercent,na.rm=TRUE)/sqrt(n())), meanCNratio=mean(Cnratio,na.rm=TRUE),seCNratio=(sd(Cnratio,na.rm=TRUE)/sqrt(n())))%>%arrange(Pond2)
+
+Microbialbiomassbypond<-Fattyacids%>% group_by(Pond, Pond2) %>% dplyr::summarise(Microbialbiomass=mean(Totalbiomass,na.rm=TRUE),seMicrobialbiomass=(sd(Totalbiomass ,na.rm=TRUE)/sqrt(n())))
+
+Foodexperiment1<-subset(Foodexperiment, Treatment=="DET1")
+
+##make new wing lengthF column -- convert M to F and leave F as is###
+
+FoodexperimentMF<-Foodexperiment1%>% mutate(WinglengthF=(ifelse(Sex=="M", (-0.71+(1.12*Winglenth)), Winglenth)))
+
+FEmodel<-lm(WinglengthF~Pond, data=FoodexperimentMF)
+
+
+Foodexperimentbypond<-FoodexperimentMF%>% group_by(Pond) %>% dplyr::summarise (n = n(), countadult = sum(is.na(daysalive)), meandayspup=mean(dayspup, na.rm=TRUE), sddayspup=sd(dayspup, na.rm=TRUE), sedayspup=(sd(dayspup ,na.rm=TRUE)/sqrt(n())), meanWinglengthF=mean(WinglengthF, na.rm=TRUE), sdWinglengthF=sd(WinglengthF, na.rm=TRUE),seWinglengthF=(sd(WinglengthF ,na.rm=TRUE)/sqrt(n())))%>% mutate(survival=countadult/n)
+
+Foodexperimetbypond<-as.data.frame(Foodexperimentbypond)
+
+Foodexperimetbypond$Pond<-factor(Foodexperimetbypond$Pond, levels=c("East","NoOil","Oil", "Golf", "Waterfall", "Vulgaris", "Vulgaris.small", "Ice"))
+
+```
+
+
+
+Fattyacidsbiomarkers
+
+1 go from wide to long
+2 merge with the table that has the biomarkers
+3 get rid of zeros
+4 FATTY ACIDS BY EACH GROUP (18 w 7 is categorized twice)
+5 back to wide form
+6 autotroph to heterotroph ratio
+7 merge back together
+8 calculate averages by pond (because I have three samples for golf and vulg)
+
+```{r Merge food quality}
+
+#1
+fattyacid_long <- gather(Fattyacids, Fattyacid, Biomass, "12:00":"24:1 w9c", factor_key=TRUE)
+
+
+#2
+fattyacid_biomarkers <- plyr::join(fattyacid_long, Biomarkers, by = "Fattyacid")
+
+#3
+
+fattyacid_biomarkers_2<-filter(fattyacid_biomarkers, Biomass > 0)
+
+#4
+fattyacidsbypond_BM1<-fattyacid_biomarkers_2%>% group_by(ID, Pond, Pond2, Biomarker1) %>% dplyr::summarise(TotalBiomass=sum(Biomass))
+fattyacidsbypond_BM2<-fattyacid_biomarkers_2%>% group_by(ID, Pond, Pond2, Biomarker2) %>% dplyr::summarise(TotalBiomass=sum(Biomass))
+
+#5 
+fattyacidbm1wide<-spread(fattyacidsbypond_BM1, key = Biomarker1, value = TotalBiomass)
+fattyacidbm1wide<-plyr::rename(fattyacidbm1wide, replace=c("Algae, cyanobacteria, diatoms" ="PP"))
+
+fattyacidbm2wide<-spread(fattyacidsbypond_BM2, key = Biomarker2, value = TotalBiomass)
+fattyacidbm2wide<- plyr::rename(fattyacidbm2wide, replace=c("Algae, cyanobacteria, diatoms" ="PP"))
+
+#6
+fattyacidbm1wide<- mutate(fattyacidbm1wide, Ratio1 = PP / Bacteria)
+fattyacidbm2wide<- mutate(fattyacidbm2wide, Ratio2 = PP / Bacteria)
+
+#7
+fattyacidbm1wide_1<-fattyacidbm1wide%>%select(ID, Pond, PP, Bacteria, Ratio1)
+fattyacidbm2wide_2<-fattyacidbm2wide%>%select(ID, Pond, PP, Bacteria, Ratio2)
+
+ratiosbysample <- merge(fattyacidbm1wide_1,fattyacidbm2wide_2,by=c("ID","Pond", "Pond2"))
+
+#8 
+
+ratiosbypond<-ratiosbysample%>% group_by(Pond, Pond2) %>% dplyr::summarise(meanBacteria1=mean(Bacteria.x, na.rm=TRUE), sdBactereia1=sd(Bacteria.x, na.rm=TRUE), meanBacteria2=mean(Bacteria.y, na.rm=TRUE), sdBacterua=sd(Bacteria.y, na.rm=TRUE), meanPP1=mean(PP.x, na.rm=TRUE), sdPP1 = sd(PP.x, na.rm=TRUE), meanPP2=mean(PP.y, na.rm=TRUE), sdPP2 = sd(PP.y, na.rm=TRUE),meanRatio1=mean(Ratio1,na.rm=TRUE), meanRatio2=mean(Ratio2), seratio1=sd(Ratio1, na.rm=TRUE)/sqrt(n()), seratio2 = sd(Ratio2, na.rm=)/sqrt(n()))
+
+
+
+```
+
+
+
+Merge food quality with pond metrics
+```{r Merge food quality}
+
+Foodqualitymetrics<-CNratiobypond %>% right_join(Microbialbiomassbypond, by=c("Pond","Pond2")) 
+
+Foodqualitymetrics_2<-Foodqualitymetrics %>% right_join(ratiosbypond, by=c("Pond","Pond2")) 
+
+Foodqualitymetrics_2$Pond<-plyr::revalue(Foodqualitymetrics_2$Pond, c("Vulgaris small"="Vulgaris.small", "No Oil"="NoOil"))
+
+Foodexperimentbypond$Pond<-plyr::revalue(Foodexperimentbypond$Pond, c("Vulgaris small"="Vulgaris.small", "No Oil"="NoOil"))
+
+Foodqualitymetrics_2<-Foodqualitymetrics_2%>% right_join(Foodexperimentbypond, by=c("Pond")) 
+
+Foodqualitypondmetrics3<-Foodqualitymetrics_2 %>% right_join(pondmetrics, by=c("Pond"))
+
+
+```
+
+
+1) Merge and test for correllations between Food quality metrics (5 variables: Percent N, Microbial biomass, Wing length, development days, in food bioassay, auto:het ratio)
+2) run a PCA
+3) Pull out the PC1 and 2 scores to make a plot
+4) Pull out the loadings. 
+    PC1 = 66% of the variation. And all 3 variables are about equally related to PC1 in an interpretable way. Higher values on PC1 = higher N, wing lenght in the food bioassay, and microbial biomass in the PLFAs. 
+5) Make the PC plot, add on the loadings as vectors
+
+
+```{r correllation and PCA food quality variables}
+
+#1
+Foodqualitymetrics4<-as.data.frame(Foodqualitymetrics_2) %>% select(c(meanWinglengthF,meandayspup, meanNper, Microbialbiomass, meanRatio1))
+
+cor(Foodqualitymetrics4)
+pairs(Foodqualitymetrics4)
+
+
+#2
+Foodquality.pca <- prcomp(Foodqualitymetrics4, center = TRUE,scale. = TRUE, retx=TRUE) ##variables are scaled to each other##
+
+summary(Foodquality.pca) ##proportion explained by components##
+ev <- Foodquality.pca$sdev^2 ##eigvenvalues##
+loadings<-Foodquality.pca$rotation ##loadings##
+
+#3
+Foodqualitypcascores<-as.data.frame(Foodquality.pca$x)
+
+Foodqualitypcascores2<-cbind(as.data.frame(Foodqualitymetrics_2), Foodqualitypcascores)
+Foodqualitypcascores3<-mutate(Foodqualitypcascores2, PC11=PC1*-1) ####multiplied PC1 by -1 so that its more easily interpretable##
+
+##export as a .csv##
+
+
+#4
+Foodqualitypcaloadings<-as.data.frame(Foodquality.pca$rotation)
+
+
+```
+
+
+
+
+
+
+```{r Make models to predict Food quality PC1}
+
+FoodqualitypondmetricsPCAscores <- merge(Foodqualitypondmetrics3,Foodqualitypcascores3, by = "Pond2")
+FoodqualitypondmetricsPCAscores <- FoodqualitypondmetricsPCAscores[, !duplicated(colnames(FoodqualitypondmetricsPCAscores))]
+
+##subset out just the predictors#
+subsetpredicators<- subset(FoodqualitypondmetricsPCAscores, select =c(Perim_avg,Area_avg,Area_loss_perc,meanDepth,meanDOC,meanNH4, meanpH,
+meanN03N02,meanlogTotalP,meanlogConduc,meanDoPerc,meantemp,meanFPOM_liter))
+
+biofilmdepnames<-subset(FoodqualitypondmetricsPCAscores, select=c("Pond2", "PC11"))
+scaledpredictors<-scale(subsetpredicators)
+allvariablesscaled<-as.data.frame(cbind(biofilmdepnames, scaledpredictors))
+
+#1
+smat3 <- abs(cor(subsetpredicators)) <= .5 #makes a correllation matrix and to say TRUE every time a value is greater than 0.5##
+smat3[!lower.tri(smat3)] <- NA ##replaces the duplications with NA#
+
+#2
+fullmodel<-lm(PC11~Perim_avg+Area_avg+Area_loss_perc+meanDepth+meanFPOM_liter+meanDOC+meanNH4+meanN03N02+meanlogTotalP+meanlogConduc+meanDoPerc+meanpH+meantemp, na.action = "na.fail", data=FoodqualitypondmetricsPCAscores)
+
+fullmodelscaled<-lm(PC11~Perim_avg+Area_avg+Area_loss_perc+meanDepth+meanFPOM_liter+meanDOC+meanNH4+meanN03N02+meanlogTotalP+meanlogConduc+meanDoPerc+meanpH+meantemp, na.action = "na.fail", data=allvariablesscaled)
+
+#3
+dredgedmodels<- dredge(fullmodel, subset=smat3, m.lim=c(1,4))
+bestmodelset<-subset(dredgedmodels, delta <2) 
+
+dredgedmodelsscaled<-dredge(fullmodelscaled,subset=smat3, m.lim=c(1,4))
+bestmodelsetscaled<-subset(dredgedmodelsscaled, delta<2)
+
+###phosphorus is the best predictor of PC1 (Food quality)
+
+```
