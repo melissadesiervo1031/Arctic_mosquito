@@ -14,19 +14,29 @@ The main file that is imported here (invertcountsperimemerg2018.csv) is appended
 
 
 ```{r Upload data and fix date formats}
+#1
 
-invertcounts2018<- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/invertcountsperimemerg2018.csv")
+invertcounts2018<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/invertcountsperimemerg2018.csv?token=AL4COXNPKXIYY4L7QL2SHES6333U6"))
+
+invertcounts2018<-as.data.frame(invertcounts2018)
 invertcounts2018$Date <- as.Date(invertcounts2018$Date, "%m/%d/%Y")
 
-emergencetraps<-read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/emergence_number_2018.csv")
+#2
+emergencetraps<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/Emergence_number_2018.csv?token=AL4COXNNSSKUFGDUPRRNRVC6332GW"))
+
+emergencetraps<-as.data.frame(emergencetraps)
+
 emergencetraps$Start.date <- as.Date(emergencetraps$Start.date, "%m/%d/%Y")
 emergencetraps$Date.collected <- as.Date(emergencetraps$Date.collected, "%m/%d/%Y")
 
-
-emergencesize<-read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/emertrap_size_2018.csv")
+#3
+emergencesize<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/Emertrap_size_2018.csv?token=AL4COXKAMZIFR63TIN554XC6332WQ"))
+emergencesize<-as.data.frame(emergencesize)
 emergencesize$Date <- as.Date(emergencesize$Date, "%m/%d/%Y")
 
-eggcount<-read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/20122017eggs.csv", header = TRUE)  # read csv file 
+#4
+eggcount<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/20122017eggs.csv?token=AL4COXNNSHGUMFEXTUPKBOS6333A6"))
+eggcount<-as.data.frame(eggcount)
 
 
 ```
@@ -44,23 +54,24 @@ library(gridExtra)
 
 1) Select the mosquito total and beetle columns and get in units of liters, and log transform
 2) Summarize by date
-3) subset out the N0s == Column 1 in Table 2
-4) subset out the last date 
-4) subset out the dates before emergence
+3) subset out the dates before emergence
+
 ```{r mosquito N0 density}
+
+#1
 
 ### 350ml * 5 = 1.75L##
 invertcounts20182<-invertcounts2018 %>% select(Date, Site, Pond2, Total, Colymlarv, PondPerimeter:Larvalstage2) %>% mutate(Totalliter = Total/1.75, Colyliter=Colymlarv/1.75)%>% mutate(logTotalliter = log(Totalliter+1), logColyliter=log(Colyliter+1))
 
+#2
 summarydensitybyliter<-invertcounts20182 %>% group_by(Site, Pond2, Date,Emergence, Larvalstage2, PondPerimeter, Depth_1, Length_1.5) %>% dplyr::summarise(n=n(), meanTotalliter=mean(Totalliter, na.rm=TRUE),sdTotalliter=sd(Totalliter, na.rm=TRUE),seTotalliter=(sdTotalliter/sqrt(n)), meanbeetleTotalliter=mean(Colyliter, na.rm=TRUE),sdbeetleliter=sd(Colyliter, na.rm=TRUE),meanlogTotalliter=mean(logTotalliter, na.rm=TRUE),sdlogTotalliter=sd(logTotalliter, na.rm=TRUE), selogTotalliter=(sdlogTotalliter/sqrt(n)),meanlogbeetleTotalliter=mean(logColyliter, na.rm=TRUE),sdlogbeetleliter=sd(logColyliter, na.rm=TRUE))
 
 summaryN0density_1<-subset(summarydensitybyliter, Larvalstage2=="N0")  
 summaryN0density<-summaryN0density_1 %>% ungroup()%>% select(c(Site, Pond2, Date, meanTotalliter, seTotalliter,  meanlogTotalliter, selogTotalliter))
 
-#5
+#3
 summarydensitybeforeemergence<-subset(summarydensitybyliter, Emergence=="Before")
 
-summaryNfinaldensity<-summarydensitybeforeemergence %>% group_by(Site) %>% filter(Date==max(Date))%>% select(Site, Date, meanTotalliter, seTotalliter, meanlogTotalliter, selogTotalliter)
 
 ```
 
@@ -95,73 +106,8 @@ totalpopN0<-totalpopN0_1%>% select(Site, Date, Totalpop, SEpop)%>% mutate(Totalp
 #7
 lastdate<-totalpopbeforeemergence %>% group_by(Site) %>% filter(Date==max(Date))%>% select(Site, Pond2, Date, Totalpop, SEpop)
 
-write.csv(totalpopbeforeemergence, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/totalpopbeforeemergence.csv")
-
-
 ```
 
-
-Graph mosquitoes and beetles total population size == Figure 3
-1) Change order of factors
-2) Turn to a long form for graphing purposes
-3) Make graph...break into two data chunks and add back together
-```{r graph total population size}
-
-mytheme<- theme_bw()+ theme(axis.line.x= element_line(colour = "black", size=0.3))+theme(axis.line.y= element_line(colour = "black", size=0.3))+theme(axis.text.x=element_text(size=5.5, colour = "black", angle=20))+theme(axis.text.y=element_text(size=6, colour = "black"))+theme(axis.title=element_text(size=6.5))+theme(plot.title=element_text(size=7) +theme(plot.title = element_text(hjust = 0.5)))+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ theme(legend.position = "none")
-
-
-#1
-totalpopbeforeemergence$Site<-factor(totalpopbeforeemergence$Site, levels=c("East", "NoOil","Oil", "Golf", "Waterfall", "Vulgaris", "Vulgaris small", "Ice"))
-
-#2
-totalpopmosquitoesbeforeemergence2<-totalpopbeforeemergence %>% select(c(Site, Pond2, Date, Totalpop, SEpop, logTotalpop, loglowerSE, logupperSE)) %>% mutate(Type="mosquito")
-    
-
-                                                                    
-totalpopbeetlesbeforeemergence2<-totalpopbeforeemergence %>% mutate(Totalpopbeetles2=Totalpopbeetles+1) %>% select(c(Site,  Pond2, Date, Totalpopbeetles2,SEpopbeetles,logTotalpopbeetles, loglowerSEbeetles, logupperSEbeetles))%>% mutate(Type="beetle")         
-
-library(data.table)
-totalpoplong<-rbindlist(list(totalpopmosquitoesbeforeemergence2, totalpopbeetlesbeforeemergence2), use.names=FALSE)
-
-#3
-longformEGINO<-subset(totalpoplong, Pond2=="1"| Pond2=="1a"| Pond2=="1b"| Pond2=="1c")
-longformOVVSW<-subset(totalpoplong, Pond2=="2a"|Pond2=="3"| Pond2=="3a"| Pond2=="4")
-
-
-prettyNum <- format_format(big.mark = ",", decimal.mark = ",", scientific = FALSE)
-
-blogTotalpopulationsizeallpondsEGINO<-ggplot(longformEGINO, aes(Date, Totalpop, group=Type)) +geom_point(aes(shape=Type),size=1)+geom_smooth(data=subset(longformEGINO,Type=="mosquito"),color="black",method='lm', size=0.5,se=FALSE)+facet_wrap(~Pond2,ncol=4)+geom_errorbar(aes(ymin=Totalpop-SEpop, ymax=Totalpop+SEpop))+ylab("N" )+xlab("") + mytheme+ theme(panel.spacing = unit(0.5, "lines"))+ theme(legend.position="none")+mytheme+theme(plot.margin=unit(c(1,1,0,1), "cm"))+scale_shape_manual(values=c(2,16))+scale_y_continuous(trans = log_trans(), breaks = base_breaks(), labels = prettyNum)+scale_x_date(labels = date_format("%b-%d"))
-
-blogTotalpopulationsizeallpondsEGINO2<-blogTotalpopulationsizeallpondsEGINO+ theme(strip.text.x = element_blank())+ geom_text(aes(as.Date("2018-06-01"), 10000000, label=Pond2, group=NULL))
-
-ann_text2 <- data.frame(Date = as.Date(c("2018-06-08", "2018-06-04"),"%Y-%m-%d"),Totalpop = c(501000, 3), Type=c("mosquito", "mosquito"),Pond2 = factor(c(1,1),levels = c("1", "1a", "1b", "1c")))
-
-blogTotalpopulationsizeallpondsEGINO3<-blogTotalpopulationsizeallpondsEGINO2+ geom_text(data = ann_text2,label= c("Mosquitoes","Diving beetles"), size=2.2 , angle=c(345, 0))
-
-
-blogTotalpopulationsizeallpondsOVVSW<-ggplot(longformOVVSW, aes(Date, Totalpop, group=Type)) +geom_point(aes(shape=Type), size=1)+geom_smooth(data=subset(longformOVVSW, Type=="mosquito"), color="black",method='lm', size=0.5, se=FALSE)+facet_wrap(~Pond2,ncol=4)+geom_errorbar(aes(ymin=Totalpop-SEpop, ymax=Totalpop+SEpop))+ylab("N" )+xlab("") + mytheme+ theme(panel.spacing = unit(0.5, "lines"))+ theme(legend.position="none")+theme(plot.margin=unit(c(0,1,1,1), "cm"))+scale_y_continuous(trans = log_trans(), breaks = base_breaks(), labels = prettyNum)+scale_shape_manual(values=c(2,16)) +scale_x_date(labels = date_format("%b-%d"))
-
-blogTotalpopulationsizeallpondsOVVSW2<-blogTotalpopulationsizeallpondsOVVSW+ theme(strip.text.x = element_blank())+ geom_text(aes(as.Date("2018-06-02"), 10000000, label=Pond2, group=NULL))
-
-library(gtable)
-g111 <- ggplotGrob(blogTotalpopulationsizeallpondsEGINO2)
-g112 <- ggplotGrob(blogTotalpopulationsizeallpondsEGINO3)
-g222 <- ggplotGrob(blogTotalpopulationsizeallpondsOVVSW2)
-
-png("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/Figure3_2.png", width = 9, height = 5.5, units = 'in', res = 800)
-grid.arrange(g111, g222 , ncol = 1, heights = c(1, 1.1))
-dev.off()
-
-png("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/Figure3annotation_2.png", width = 9, height = 5.5, units = 'in', res = 800)
-grid.arrange(g112, g222 , ncol = 1, heights = c(1, 1.1))
-dev.off()
-
-
-jpeg("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/Figure3_2.jpeg", width = 6, height = 5, units = 'in', res = 600)
-grid.arrange(g112, g222 , ncol = 1, heights = c(1, 1.1))
-dev.off()
-
-```
 
 Calculate per capita mortality
 1) For total abundance Coefficients for "Date"  == Column in Table 2
@@ -196,33 +142,14 @@ emergencetrapcumulative3<-emergencetrapcumulative2  %>% group_by(Pond, SS)%>% ar
 
 emergencebysamplingstation<-emergencetrapcumulative3 %>% group_by(Pond, SS) %>% filter(Date.collected==max(Date.collected))
 
-#anova total emergence by pond##
-hist(emergencebysamplingstation$cumemerg)
-hist(log(emergencebysamplingstation$cumemerg))
-
 emergmodel<-lm(log(cumemerg)~Pond, data=emergencebysamplingstation)
 
 ###
 emergencencebydate<-emergencetrapcumulative3 %>% group_by(Pond, Date.collected) %>% dplyr::summarise(meancumemerg=mean(cumemerg2, na.rm=TRUE), Stdevcumemerg=sd(cumemerg, na.rm=TRUE), Sterrorcumemerg=(sd(cumemerg, na.rm=TRUE)/sqrt(n())),logmeancumemerg=mean(logcumemerg2, na.rm=TRUE), logStdevcumemerg=sd(logcumemerg, na.rm=TRUE), logSterrorcumemerg=(sd(logcumemerg, na.rm=TRUE)/sqrt(n())))
 
 totalemergencebydate<-emergencencebydate%>% group_by(Pond) %>% filter(meancumemerg==max(meancumemerg))%>% select(c(Pond, meancumemerg,Sterrorcumemerg, logmeancumemerg, logSterrorcumemerg))
-  
-cumulativeemergencegraph<-ggplot(emergencencebydate, aes(Date.collected, meancumemerg, color=Pond))+ geom_point(aes(group=Pond)) + geom_line(aes(group=Pond))+geom_errorbar(aes(ymin=meancumemerg-Sterrorcumemerg, ymax=meancumemerg+Sterrorcumemerg)) + scale_x_date(date_breaks = "5 days",labels=date_format("%m-%d"))+mytheme+ylab("Cumulative emergence #/trap ")+theme(legend.title=element_blank())
-
-
-png("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/Cumulativeemergence.png", width = 9, height = 5.5, units = 'in', res = 800)
-cumulativeemergencegraph
-dev.off()
-
-
-write.csv(emergencetrapcumulative3, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/emergencetrapcumulative.csv")
-
-write.csv(emergencencebydate, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/emergencetrapcumulativebydate.csv")
-
 
 ```
-
-
 
 
 
@@ -240,86 +167,6 @@ emergencetrapcumsex2<-emergencetrapcumsex %>% group_by(Pond,Date.collected) %>% 
 emergencetrapcumsex3<-emergencetrapcumsex2  %>% group_by(Pond, SS)%>% arrange(Pond, SS, Date.collected)%>% dplyr::mutate(cumemergmale2=cumsum(male2),cumemergfemale2=cumsum(female2))
 
 emergencebysamplingstationsex<-emergencetrapcumsex3 %>% group_by(Pond, SS) %>% filter(Date.collected==max(Date.collected)) %>% mutate(sexratio=cumemergmale2/cumemergfemale2)
-
-write.csv(emergencebysamplingstationsex, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/emergencetrapcumulativesexratios.csv")
-
-
-
-##anova on sex ratio differences between ponds ##
-
-sexratiolm<-lm(sexratio~Pond, data=emergencebysamplingstationsex)
-
-```
-
-
-
-
-
-
-```{r emergence trap size by sex}
-
-head(emergencesize)
-
-summaryemergencesizemf<-emergencesize %>% group_by(Pond2, Sex) %>% dplyr::summarise(Winglength=mean(Winglength2, na.rm=TRUE),  Stdevwing=sd(Winglength2, na.rm=TRUE), Sterrorwing=(sd(Winglength2, na.rm=TRUE)/sqrt(n())), n=n())
-
-summaryemergencesizem<-subset(summaryemergencesizemf, Sex=="M")
-summaryemergencesizef<-subset(summaryemergencesizemf, Sex=="F")
-
-
-
-summaryemergencesizemfwide<-cbind(summaryemergencesizem,summaryemergencesizef)
-
-summaryemergencesizemfwide2<-mutate(summaryemergencesizemfwide, predictedF=-0.7145+Winglength1*1.125)
-
-mfsizegraph<-ggplot(data = summaryemergencesizemfwide2,aes(x = Winglength,y = Winglength1)) + geom_point() + geom_errorbar(aes(ymin = Winglength1-Sterrorwing1,ymax = Winglength1+Sterrorwing1)) + geom_errorbarh(aes(xmin = Winglength-Sterrorwing,xmax = Winglength+Sterrorwing))+mytheme+xlab("Male wing length (mm)")+ylab("Female wing length (mm)")+ annotate("text", x = 4.2, y = 5.2, label = "Female == -0.71 + 1.26*Male", parse=TRUE, size=3)+geom_text(aes(label=Pond2),position=position_nudge(y=-0.03, x=0.03), size=2)+geom_line(aes(x=Winglength1, y=predictedF))+xlim(3.5, 5.5)+ylim(3.5, 5.5)
-
-
-
-png("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/mfsize.png", width = 4, height = 4, units = 'in', res = 800)
-mfsizegraph
-dev.off()
-
-
-```
-
-
-
-
-
-
-
-
-
-Relationship between emergence trap number and density/liter at end
-1) actual final density
-2) predicted final density
-```{r emergence trap vs. final density per liter}
-
-#1 
-emergenceanddensity <- emergence %>% right_join(summaryNfinaldensity, by=c("Site"))
-
-mytheme<- theme_bw()+ theme(axis.line.x= element_line(colour = "black", size=0.3))+theme(axis.line.y= element_line(colour = "black", size=0.3))+theme(axis.text.x=element_text(size=6, colour = "black"))+theme(axis.text.y=element_text(size=6, colour = "black"))+theme(axis.title=element_text(size=9))+theme(plot.title=element_text(size=7) +theme(plot.title = element_text(hjust = 0.5)))
-
-emergencedensityplot<-ggplot(emergenceanddensity, aes(log(meanTotalliter), log(cumemerpertrap))) +geom_point()+geom_text(aes(label=Site),position=position_nudge(y=-0.08))+xlim(0.75,4.5)+ylim(2,6.5) + mytheme
-
-#2
-numberdays<-summarydensitybeforeemergence %>% group_by(Site) %>% mutate(numdays=difftime(max(Date), min(Date), units="days"))%>% filter(Date==min(Date))%>% select(c(Site, numdays))
-
-#numberdays not working correctly##
-
-numberdays2<- data.frame("Site" = c("East", "Golf", "Ice", "NoOil", "Oil", "Vulgaris", "Vulgaris small", "Waterfall"), "numdays" = c(21, 18, 22, 16, 20, 18, 19,23))
-
-
-N0mort <- summaryN0density %>% right_join(fitsabundacedf, by=c("Site"))
-
-N0mortdays <- N0mort %>% right_join(numberdays2, by=c("Site"))
-
-Ndensitypredictfinal<-N0mortdays %>% mutate(numberdays2=as.numeric(numdays), lnNdensityfinal=log(meanTotalliter)+(numdays*Date.y),Ndensityfinal=exp(lnNdensityfinal))
-
-emergenceanddensitypredict <- emergence %>% right_join(Ndensitypredictfinal, by=c("Site"))
-
-emergencedensityplot2<-ggplot(emergenceanddensitypredict, aes(lnNdensityfinal, log(cumemerpertrap))) +geom_point()+geom_text(aes(label=Site),position=position_nudge(y=-0.08))+xlim(0.75,4)+ylim(2,6.5) + mytheme
-
 
 ```
 
@@ -359,7 +206,6 @@ aictable<-function(X,m){
 
 
 
-
 Wing length fecundtiy power function == Figure supplemental 1
 ```{r power function wing egg}
 
@@ -385,18 +231,6 @@ rawaic<-AIC(wingtoegglinear, wingtoeggpower, wingtoeggexplin, wingtoeggpowerlin)
 nR<-dim(eggcount)[1]  #Sample size 
 aictable(rawaic,nR)
 
-##add a column for predicted value using the formula##
-eggcount2<-mutate(eggcount, predictedeggs=5.06*Winglength^1.645)
-
-mytheme<- theme_bw()+ theme(axis.line.x= element_line(colour = "black", size=0.3))+theme(axis.line.y= element_line(colour = "black", size=0.3))+theme(axis.text.x=element_text(size=8, colour = "black"))+theme(axis.text.y=element_text(size=8, colour = "black"))+theme(axis.title=element_text(size=9))+theme(plot.title=element_text(size=7) +theme(plot.title = element_text(hjust = 0.5)))
-
-winglengtheggscurve<-ggplot(eggcount2, aes(x=Winglength, y=Eggs)) +geom_point(size=0.5)+mytheme+geom_line(aes(x=Winglength, y=predictedeggs))+xlab("Wing length (mm)")+ylab("Eggs / female")+ annotate("text", x = 3, y = 110, label = "E == 5.06 *W^{1.65}", parse=TRUE, size=3)
-
-png("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/FigureS1_2.png", width = 4, height = 4, units = 'in', res = 800)
-winglengtheggscurve
-dev.off()
-
-
 ```
 
 
@@ -419,15 +253,14 @@ emergencesize_2femalesonly<-subset(emergencesize_2, Sex=="F")
 
 summaryemergencesize<-emergencesize_2femalesonly %>% group_by(Site) %>% dplyr::summarise(Winglength=mean(Winglength2, na.rm=TRUE), varwing=var(Winglength2, na.rm=TRUE), Stdevwing=sd(Winglength2, na.rm=TRUE), Sterrorwing=(sd(Winglength2, na.rm=TRUE)/sqrt(n())),coefvar=(Stdevwing/Winglength), meaneggs=mean(eggs, na.rm=TRUE), vareggs=var(eggs, na.rm=TRUE), Stdeveggs=sd(eggs, na.rm=TRUE), Sterroreggs=(sd(eggs, na.rm=TRUE)/sqrt(n())))
 
-sizebypond<-ggplot(summaryemergencesize, aes(x=Site, y=Winglength)) +geom_point()+ geom_errorbar(aes(ymin = Winglength-Sterrorwing,ymax = Winglength+Sterrorwing))+mytheme+xlab("")
-
-sizebypondhist<-ggplot(emergencesize_2femalesonly, aes(x=Winglength2, fill=Site)) + geom_density(alpha=.3)
-
 ```
 
 1) pull together data
 
-```{r calculate R and Larvae next year}
+```{r calculate lambda and Larvae next year}
+
+numberdays2<- data.frame("Site" = c("East", "Golf", "Ice", "NoOil", "Oil", "Vulgaris", "Vulgaris small", "Waterfall"), "numdays" = c(21, 18, 22, 16, 20, 18, 19,23))
+
 
 DensityabundanceN0<-summaryN0density %>% right_join(totalpopN0, by=c("Site", "Date"))
 
@@ -439,21 +272,15 @@ DAN0mortsize<-DAN0mort_2 %>% right_join(summaryemergencesize, by=c("Site")) %>% 
 
 DAN0mortsizenumberemerg<-DAN0mortsize %>% merge(totalemergencebydate, by.x=c("Site"), by.y=c("Pond"))
 
-###Calculate R##
+###Calculate lambda ##
 
 Survadult<-0.9 ##survival from pupae to adult##
 Propfemale<-0.5 ##proportion that are female##
 ProbBM<-0.17 ##probability of a blood meal##
-Survegginstar<-0.625 ## probability of egg to first instar, calculated so that average R = 0
+Survegginstar<-0.625 ## probability of egg to first instar, calculated so that average lambda = 1
 
 
 Mozpopmetrics<-DAN0mortsizenumberemerg %>% mutate(Lambdatotalpop=(exp(mortality*numdays2))*Survadult*Propfemale*meaneggs*ProbBM*Survegginstar, Nt1=meanTotalliter*Lambdatotalpop)
-
-
-
-write.csv(Mozpopmetrics, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/mosquitometrics.csv")
- 
-
 
 ```
 
@@ -472,46 +299,6 @@ beetletotalpop<-totalpopbeforeemergence%>% group_by(Site) %>% filter(Totalpopbee
 
 beetlemetrics<- beetledensity %>% right_join(beetletotalpop, by=c("Site"))
 
-write.csv(beetlemetrics, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/beetlemetrics.csv")
-
-
 
 ```
 
-
-
-```{r N vs N}
-
-NvsNt<-ggplot(Mozpopmetrics, aes(meanTotalliter, N0T1dens)) +geom_point()+geom_text(aes(label=Site),position=position_nudge(y=-2), size=2)+xlim(0, 150)+ylim(0, 150)+xlab(expression(N[0]/ L))+ylab(expression(N[t+1]/ L)) + mytheme +geom_abline(slope=1, linetype="dashed")
-
-png("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/NvsNt.png", width = 4, height = 4, units = 'in', res = 800)
-NvsNt
-dev.off()
-
-```
-
-
-
-
-```{r emergence trap number and size}
-
-emergsize<-ggplot(Mozpopmetrics, aes(logmeancumemerg, Winglength)) +geom_point()+geom_text(aes(label=Pond2),position=position_nudge(y=-.05), size=2)+xlim(2,6.5)+ylim(3.5, 5.6)+xlab(bquote(atop("Density of emerging adults" , ln (ind/trap))))+ylab("Wing length (mm)") + mytheme 
-
-png("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/FigureS2.png", width = 4, height = 4, units = 'in', res = 800)
-emergsize
-dev.off()
-
-```
-
-
-
-
-```{r N vs Wing length}
-
-Nvssize<-ggplot(Mozpopmetrics, aes(meanTotalliter, Winglength)) +geom_point()+geom_text(aes(label=Site),position=position_nudge(y=-0.05), size=2)+xlim(0, 150)+ylim(3, 6)+xlab(expression(ln(N[0])/ L))+ylab("Wing Length (mm)") + mytheme 
-
-png("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/NvsNt.png", width = 5, height = 5, units = 'in', res = 800)
-NvsNt
-dev.off()
-
-```
