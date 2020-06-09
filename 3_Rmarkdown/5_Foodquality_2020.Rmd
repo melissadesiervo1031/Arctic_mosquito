@@ -1,0 +1,318 @@
+---
+title: "BiofilmQuality"
+author: "Melissa DeSiervo"
+date: "5/28/2019"
+output: html_document
+---
+
+First, upload the data
+```{r Upload data}
+
+CNratiodetritus <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/CNdetritus.csv")
+
+Fattyacids <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/Fattyacids_raw.csv", check.names=FALSE)
+
+Biomarkers <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/Fattyacids_biomarker.csv")
+
+Foodexperiment <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/Foodexperiment_2018.csv")
+
+pondmetrics <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/abioticbypond.csv")
+
+```
+
+
+packages
+```{r Upload packages}
+
+library(dplyr)
+library(MuMIn)
+library(ggplot2)
+library(plyr)
+library(tidyr)
+
+```
+
+
+
+ANOVA tests size, % N
+```{r Calculate by pond}
+
+hist(CNratiodetritus$Npercent)
+
+Npercentm1<-lm(Npercent~Pond, data=CNratiodetritus)
+
+
+Foodexperiment1<-subset(Foodexperiment, Treatment=="DET1")
+
+hist(Foodexperiment1$Winglenth)
+
+Winglengthtm1<-lm(Winglenth~Pond, data=Foodexperiment1)
+dayspupm2<-lm(dayspup~Pond, data=Foodexperiment1)
+
+
+```
+
+
+
+
+
+Averages and standard error by pond
+```{r Calculate by pond}
+
+CNratiobypond<-CNratiodetritus%>% group_by(Pond, Pond2) %>% dplyr::summarise(meanN=mean(Nmg,na.rm=TRUE),seN=(sd(Nmg,na.rm=TRUE)/sqrt(n())),meanNper=mean(Npercent,na.rm=TRUE),seNper=(sd(Npercent,na.rm=TRUE)/sqrt(n())), meanCper=mean(Cpercent,na.rm=TRUE),seCper=(sd(Cpercent,na.rm=TRUE)/sqrt(n())), meanCNratio=mean(Cnratio,na.rm=TRUE),seCNratio=(sd(Cnratio,na.rm=TRUE)/sqrt(n())))%>%arrange(Pond2)
+
+Microbialbiomassbypond<-Fattyacids%>% group_by(Pond, Pond2) %>% dplyr::summarise(Microbialbiomass=mean(Totalbiomass,na.rm=TRUE),seMicrobialbiomass=(sd(Totalbiomass ,na.rm=TRUE)/sqrt(n())))
+
+Foodexperiment1<-subset(Foodexperiment, Treatment=="DET1")
+
+##make new wing lengthF column -- convert M to F and leave F as is###
+
+FoodexperimentMF<-Foodexperiment1%>% mutate(WinglengthF=(ifelse(Sex=="M", (-0.71+(1.12*Winglenth)), Winglenth)))
+
+FEmodel<-lm(WinglengthF~Pond, data=FoodexperimentMF)
+
+
+Foodexperimentbypond<-FoodexperimentMF%>% group_by(Pond) %>% dplyr::summarise (n = n(), countadult = sum(is.na(daysalive)), meandayspup=mean(dayspup, na.rm=TRUE), sddayspup=sd(dayspup, na.rm=TRUE), sedayspup=(sd(dayspup ,na.rm=TRUE)/sqrt(n())), meanWinglengthF=mean(WinglengthF, na.rm=TRUE), sdWinglengthF=sd(WinglengthF, na.rm=TRUE),seWinglengthF=(sd(WinglengthF ,na.rm=TRUE)/sqrt(n())))%>% mutate(survival=countadult/n)
+
+Foodexperimetbypond<-as.data.frame(Foodexperimentbypond)
+
+Foodexperimetbypond$Pond<-factor(Foodexperimetbypond$Pond, levels=c("East","NoOil","Oil", "Golf", "Waterfall", "Vulgaris", "Vulgaris.small", "Ice"))
+
+```
+
+
+
+Fattyacidsbiomarkers
+
+1 go from wide to long
+2 merge with the table that has the biomarkers
+3 get rid of zeros
+4 FATTY ACIDS BY EACH GROUP (18 w 7 is categorized twice)
+5 back to wide form
+6 autotroph to heterotroph ratio
+7 merge back together
+8 calculate averages by pond (because I have three samples for golf and vulg)
+
+```{r Merge food quality}
+
+#1
+fattyacid_long <- gather(Fattyacids, Fattyacid, Biomass, "12:00":"24:1 w9c", factor_key=TRUE)
+
+
+#2
+fattyacid_biomarkers <- plyr::join(fattyacid_long, Biomarkers, by = "Fattyacid")
+
+#3
+
+fattyacid_biomarkers_2<-filter(fattyacid_biomarkers, Biomass > 0)
+
+#4
+fattyacidsbypond_BM1<-fattyacid_biomarkers_2%>% group_by(ID, Pond, Pond2, Biomarker1) %>% dplyr::summarise(TotalBiomass=sum(Biomass))
+fattyacidsbypond_BM2<-fattyacid_biomarkers_2%>% group_by(ID, Pond, Pond2, Biomarker2) %>% dplyr::summarise(TotalBiomass=sum(Biomass))
+
+#5 
+fattyacidbm1wide<-spread(fattyacidsbypond_BM1, key = Biomarker1, value = TotalBiomass)
+fattyacidbm1wide<-plyr::rename(fattyacidbm1wide, replace=c("Algae, cyanobacteria, diatoms" ="PP"))
+
+fattyacidbm2wide<-spread(fattyacidsbypond_BM2, key = Biomarker2, value = TotalBiomass)
+fattyacidbm2wide<- plyr::rename(fattyacidbm2wide, replace=c("Algae, cyanobacteria, diatoms" ="PP"))
+
+#6
+fattyacidbm1wide<- mutate(fattyacidbm1wide, Ratio1 = PP / Bacteria)
+fattyacidbm2wide<- mutate(fattyacidbm2wide, Ratio2 = PP / Bacteria)
+
+#7
+fattyacidbm1wide_1<-fattyacidbm1wide%>%select(ID, Pond, PP, Bacteria, Ratio1)
+fattyacidbm2wide_2<-fattyacidbm2wide%>%select(ID, Pond, PP, Bacteria, Ratio2)
+
+ratiosbysample <- merge(fattyacidbm1wide_1,fattyacidbm2wide_2,by=c("ID","Pond", "Pond2"))
+
+#8 
+
+ratiosbypond<-ratiosbysample%>% group_by(Pond, Pond2) %>% dplyr::summarise(meanBacteria1=mean(Bacteria.x, na.rm=TRUE), sdBactereia1=sd(Bacteria.x, na.rm=TRUE), meanBacteria2=mean(Bacteria.y, na.rm=TRUE), sdBacterua=sd(Bacteria.y, na.rm=TRUE), meanPP1=mean(PP.x, na.rm=TRUE), sdPP1 = sd(PP.x, na.rm=TRUE), meanPP2=mean(PP.y, na.rm=TRUE), sdPP2 = sd(PP.y, na.rm=TRUE),meanRatio1=mean(Ratio1,na.rm=TRUE), meanRatio2=mean(Ratio2), seratio1=sd(Ratio1, na.rm=TRUE)/sqrt(n()), seratio2 = sd(Ratio2, na.rm=)/sqrt(n()))
+
+
+
+```
+
+
+
+Plot the number of autotrophs and heterotrophs
+
+
+```{r plot auto vs hetero}
+
+
+mytheme<- theme_bw()+ theme(axis.line.x= element_line(colour = "black", size=0.3))+theme(axis.line.y= element_line(colour = "black", size=0.3))+theme(axis.text.x=element_text(size=8, colour = "black"))+theme(axis.text.y=element_text(size=8, colour = "black"))+theme(axis.title=element_text(size=9))+theme(plot.title=element_text(size=7) +theme(plot.title = element_text(hjust = 0.5)))
+
+
+
+autotrophicvheterotrophic<-ggplot(ratiosbypond, aes(meanPP1, meanBacteria1)) +geom_point()+geom_text(aes(label=Pond2),position=position_nudge(y=-30), size=2) +xlab("Biomass FA autotrophs (nmol/g)")+ylab("Biomass FA heterotrophs (nmol/g)")+xlim(50, 1350)+ylim(50,1350)+ mytheme +geom_abline(slope=1, linetype="dashed")+ annotate("text", x = 100, y =1250, label = "A)")
+
+autotrophicvheterotrophic2<-ggplot(ratiosbypond, aes(meanPP2, meanBacteria2)) +geom_point()+geom_text(aes(label=Pond2),position=position_nudge(y=-30), size=2) +xlab("Biomass FA autotrophs (nmol/g)")+ylab("")+theme(axis.text.x = element_blank())+xlim(50, 1350)+ylim(50,1350)+ mytheme +geom_abline(slope=1, linetype="dashed")+ annotate("text", x = 100, y =1250, label = "B)")
+
+png("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/FigureS4.png", width = 6, height = 3, units = 'in', res = 800)
+grid.arrange(autotrophicvheterotrophic, autotrophicvheterotrophic2, nrow=1)
+dev.off()
+
+```
+
+
+
+
+
+
+
+Merge food quality with pond metrics
+```{r Merge food quality}
+
+Foodqualitymetrics<-CNratiobypond %>% right_join(Microbialbiomassbypond, by=c("Pond","Pond2")) 
+
+Foodqualitymetrics_2<-Foodqualitymetrics %>% right_join(ratiosbypond, by=c("Pond","Pond2")) 
+
+Foodqualitymetrics_2$Pond<-plyr::revalue(Foodqualitymetrics_2$Pond, c("Vulgaris small"="Vulgaris.small", "No Oil"="NoOil"))
+
+Foodexperimentbypond$Pond<-plyr::revalue(Foodexperimentbypond$Pond, c("Vulgaris small"="Vulgaris.small", "No Oil"="NoOil"))
+
+Foodqualitymetrics_2<-Foodqualitymetrics_2%>% right_join(Foodexperimentbypond, by=c("Pond")) 
+
+Foodqualitypondmetrics3<-Foodqualitymetrics_2 %>% right_join(pondmetrics, by=c("Pond"))
+
+
+```
+
+
+Export food quality csv
+```{r export food qualitly csv}
+
+write.csv(Foodqualitymetrics_2, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/foodqualitytable4.csv")
+
+
+
+```
+
+
+
+1) Merge and test for correllations between Food quality metrics (5 variables: Percent N, Microbial biomass, Wing length, development days, in food bioassay, auto:het ratio)
+2) run a PCA
+3) Pull out the PC1 and 2 scores to make a plot
+4) Pull out the loadings. 
+    PC1 = 66% of the variation. And all 3 variables are about equally related to PC1 in an interpretable way. Higher values on PC1 = higher N, wing lenght in the food bioassay, and microbial biomass in the PLFAs. 
+5) Make the PC plot, add on the loadings as vectors
+
+
+```{r correllation and PCA food quality variables}
+
+#1
+Foodqualitymetrics4<-as.data.frame(Foodqualitymetrics_2) %>% select(c(meanWinglengthF,meandayspup, meanNper, Microbialbiomass, meanRatio1))
+
+cor(Foodqualitymetrics4)
+pairs(Foodqualitymetrics4)
+
+
+#2
+Foodquality.pca <- prcomp(Foodqualitymetrics4, center = TRUE,scale. = TRUE, retx=TRUE) ##variables are scaled to each other##
+
+summary(Foodquality.pca) ##proportion explained by components##
+ev <- Foodquality.pca$sdev^2 ##eigvenvalues##
+loadings<-Foodquality.pca$rotation ##loadings##
+
+#3
+Foodqualitypcascores<-as.data.frame(Foodquality.pca$x)
+
+Foodqualitypcascores2<-cbind(as.data.frame(Foodqualitymetrics_2), Foodqualitypcascores)
+Foodqualitypcascores3<-mutate(Foodqualitypcascores2, PC11=PC1*-1) ####multiplied PC1 by -1 so that its more easily interpretable##
+
+##export as a .csv##
+
+
+#4
+Foodqualitypcaloadings<-as.data.frame(Foodquality.pca$rotation)
+
+
+PCAplot<-ggplot(Foodqualitypcascores3, aes(x=PC11,y=PC2)) +geom_point()+geom_text(aes(label=Pond2),position=position_nudge(y=-0.1), size=2.5) +xlab("PCA 1,  69%")+ylab("PCA 2,  14%")+ mytheme+  annotate("segment", xend = -4.6, x =  0, y = -2.3, yend=-2.3, colour = "black", size=0.5,  arrow=arrow(length=unit(0.150,"cm"), ends="first", type = "closed")) + annotate("text", x = -2.65, y =-2.25, label = "% N, Microbial biomass, Mosquito wing length", size=2.5)+  annotate("segment", xend = 0, x =  -4.6, y = -2.5, yend=-2.5, colour = "black", size=0.5,  arrow=arrow(length=unit(0.150,"cm"), ends="first", type = "closed"))+ annotate("text", x = -1.95, y =-2.45, label = "Autotroph:heterotroph ratio, Development days", size=2.5)+  annotate("segment", xend = -4.65, x =  -4.65, y = -1.8, yend=1.9, colour = "black", size=0.5,  arrow=arrow(length=unit(0.150,"cm"), ends="first", type = "closed"))+ annotate("text", x = -4.5, y=1.2, label = "Autotroph:Heterotroph ratio", size=2.5, angle=270)+  annotate("segment", xend = -4.35, x =  -4.35, y = 0.5, yend=1.9, colour = "black", size=0.5,  arrow=arrow(length=unit(0.150,"cm"), ends="first", type = "closed"))+ annotate("text", x = -4.2, y=1.75, label = "% N", size=2.5, angle=270)  +  annotate("segment", xend = -3.95, x=  -3.95, yend = 0.5, y=1.9, colour = "black", size=0.5,  arrow=arrow(length=unit(0.150,"cm"), ends="first", type = "closed"))+ annotate("text", x = -4.1, y=1, label = "Microbial biomass", size=2.5, angle=90)+xlim(-4.7, 3)
+
+
+PCAplot2<-ggplot(Foodqualitypcascores3, aes(x=PC11,y=PC2)) +geom_point(size=0.75)+geom_text(aes(label=Pond2),position=position_nudge(y=-0.1), size=2.5) +xlab("PCA 1,  69%")+ylab("PCA 2,  14%")+ mytheme+  annotate("segment", xend = -4.6, x =  2.5, y = -2.3, yend=-2.3, colour = "black", size=0.5,  arrow=arrow(length=unit(0.150,"cm"), ends="first", type = "closed")) + annotate("text", x = -2.4, y =-2.2, label = "% N, Microbial biomass, Mosquito wing length", size=1.8)+  annotate("segment", xend = 2.5, x =  -4.6, y = -2.5, yend=-2.5, colour = "black", size=0.5,  arrow=arrow(length=unit(0.150,"cm"), ends="first", type = "closed"))+ annotate("text", x =0.4, y =-2.4, label = "Autotroph:heterotroph ratio, Development days", size=1.8)
+
+png("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/FigureS4.png", width = 2.9, height = 2.9, units = 'in', res = 800)
+PCAplot2
+dev.off()
+
+
+write.csv(Foodqualitypcascores3, "C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/Foodqualitymetrics.csv")
+
+
+#plot size and development days from food quality experiment# 
+
+p1<-ggplot(Foodqualitymetrics2, aes(x=meandayspup, y=meanWinglength)) + geom_point()+ geom_errorbar(aes(ymin = meanWinglength-seWinglength,ymax = meanWinglength+seWinglength), size=0.5) + geom_errorbarh(aes(xmin = meandayspup-sedayspup,xmax = meandayspup+sedayspup), size=0.5)+xlim(14, 22)+ylim(3.8, 5.3)+mytheme+geom_smooth(method="lm", formula= (y ~ log(x)), se=FALSE, linetype = 1) + xlab("Development time until Pupation (days)")+ylab("Wing Length (mm)")+geom_text(aes(label=Pond),position=position_nudge(y=-0.03, x=0.5), size=2.5)
+
+cor.test(Foodqualitymetrics2$meandayspup, Foodqualitymetrics2$meanWinglength)
+
+
+png("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/Winglengthdevtime.png", width = 4, height = 4, units = 'in', res = 800)
+p1
+dev.off()
+
+
+```
+
+
+
+
+
+
+```{r Make models to predict Food quality PC1}
+
+FoodqualitypondmetricsPCAscores <- merge(Foodqualitypondmetrics3,Foodqualitypcascores3, by = "Pond2")
+FoodqualitypondmetricsPCAscores <- FoodqualitypondmetricsPCAscores[, !duplicated(colnames(FoodqualitypondmetricsPCAscores))]
+
+##subset out just the predictors#
+subsetpredicators<- subset(FoodqualitypondmetricsPCAscores, select =c(Perim_avg,Area_avg,Area_loss_perc,meanDepth,meanDOC,meanNH4, meanpH,
+meanN03N02,meanlogTotalP,meanlogConduc,meanDoPerc,meantemp,meanFPOM_liter))
+
+biofilmdepnames<-subset(FoodqualitypondmetricsPCAscores, select=c("Pond2", "PC11"))
+scaledpredictors<-scale(subsetpredicators)
+allvariablesscaled<-as.data.frame(cbind(biofilmdepnames, scaledpredictors))
+
+#1
+smat3 <- abs(cor(subsetpredicators)) <= .5 #makes a correllation matrix and to say TRUE every time a value is greater than 0.5##
+smat3[!lower.tri(smat3)] <- NA ##replaces the duplications with NA#
+
+#2
+fullmodel<-lm(PC11~Perim_avg+Area_avg+Area_loss_perc+meanDepth+meanFPOM_liter+meanDOC+meanNH4+meanN03N02+meanlogTotalP+meanlogConduc+meanDoPerc+meanpH+meantemp, na.action = "na.fail", data=FoodqualitypondmetricsPCAscores)
+
+fullmodelscaled<-lm(PC11~Perim_avg+Area_avg+Area_loss_perc+meanDepth+meanFPOM_liter+meanDOC+meanNH4+meanN03N02+meanlogTotalP+meanlogConduc+meanDoPerc+meanpH+meantemp, na.action = "na.fail", data=allvariablesscaled)
+
+#3
+dredgedmodels<- dredge(fullmodel, subset=smat3, m.lim=c(1,4))
+bestmodelset<-subset(dredgedmodels, delta <2) 
+
+dredgedmodelsscaled<-dredge(fullmodelscaled,subset=smat3, m.lim=c(1,4))
+bestmodelsetscaled<-subset(dredgedmodelsscaled, delta<2)
+
+##
+#plot them#
+
+mytheme<- theme_bw()+ theme(axis.line.x= element_line(colour = "black", size=0.3))+theme(axis.line.y= element_line(colour = "black", size=0.3))+theme(axis.text.x=element_text(size=6, colour = "black"))+theme(axis.text.y=element_text(size=6, colour = "black"))+theme(axis.title=element_text(size=8))+theme(plot.title=element_text(size=7) +theme(plot.title = element_text(hjust = 0.5)))+ theme(axis.title.y = element_text(margin = margin(t = 0, r = 15, b = 0, l = 0)))+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+
+Perimeterplot<-ggplot(allvariablesbypond, aes(x=Perim_avg, y=Prod.ug.cm.day)) + geom_point(size=0.8)+geom_text(aes(label=Pond2),position=position_nudge(y=-0.2), size=2)+xlab(bquote(atop("Pond perimeter" (m^{2}))))+ylab(bquote(atop("Biofilm productivity" , ( ~ μg  ~C %.%  ~ cm^{-2} %.% ~day^{-1}))))+ggtitle("")+ stat_smooth(method="lm", se=FALSE, color = "black")+ mytheme+xlim(30, 300)+ylim(-1, 6)+annotate()
+
+TotalPplot<-ggplot(FoodqualitypondmetricsPCAscores, aes(x=meanlogTotalP, y=PC11)) + geom_point(size=0.8)+geom_text(aes(label=Pond2),position=position_nudge(y=-0.2), size=2)+xlab(bquote(atop("ln(Total P (µg/ L))")))+ylab("Food quality (PC1)")+ggtitle("")+ stat_smooth(method="lm", se=FALSE, color = "black")+ mytheme+ylim(-4, 3)+xlim(1.25, 3.75)
+
+
+jpeg("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/Figure5.png", width = 6, height = 3.5, units = 'in', res = 600)
+grid.arrange(Perimeterplot, TotalPplot, ncol=2)
+dev.off()
+
+
+model1<-lm(PC11~meanlogTotalP, data=FoodqualitypondmetricsPCAscores)
+
+```
+
+winglengdev<-ggplot(Foodqualitypondmetrics3, aes(x=meandayspup, y=meanWinglength)) + geom_point(size=0.8)+geom_text(aes(label=Pond2),position=position_nudge(y=-0.02), size=2)+xlab(bquote(atop("Development time (days)")))+ylab("Wing length (mm)")+ggtitle("")+ stat_smooth(method="lm", se=FALSE, color = "black")+ mytheme+xlim(15, 21)+ylim(3.8, 5.1)
+
+jpeg("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/winglengdev.png", width = 3, height = 3, units = 'in', res = 600)
+winglengdev
+dev.off()
