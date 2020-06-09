@@ -18,19 +18,30 @@ First, upload the data
 ```{r Upload data}
 
 #1
-BiofilmproductivitySS <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/Biofilmmetrics_samplingstation.csv")
+
+BiofilmproductivitySS<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/4_Outputs/Biofilmmetrics_samplingstation.csv?token=AL4COXIEZYBXCZEGBORC7FK634DA4"))
+
+BiofilmproductivitySS-as.data.frame(BiofilmproductivitySS)
 
 #2
-allpondmetricsbysamplingstation <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/allpondmetricsbysamplingstation.csv")
-allpondmetricsbysamplingstation$Date <- as.Date(allpondmetricsbysamplingstation$Date, "%m/%d/%Y")
+
+allpondmetricsbysamplingstation<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/allpondmetricsbysamplingstation.csv?token=AL4COXI5XA4YUHOLW6KPFG2634COY"))
+
+allpondmetricsbysamplingstation-as.data.frame(allpondmetricsbysamplingstation)
 
 #3
-perimeterarea <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/perimeterandareaponds_2018.csv",header = TRUE)
+perimeterarea<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/2_Inputs/perimeterandareaponds_2018.csv?token=AL4COXMXRF5HEGMXNDYHPEC634C4Y"))
+
+
+perimeterarea<-as.data.frame(perimeterarea)
 perimeterarea$Pond <- as.factor(perimeterarea$Pond)
 perimeterarea$Date <- as.Date(perimeterarea$Date, "%m/%d/%Y")
 
 #4
-tempandthermalsums <- read.csv("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/watertempthermalsums.csv")
+
+tempandthermalsums<-read.csv(url("https://raw.githubusercontent.com/melissadesiervo1031/Arctic_mosquito/master/4_Outputs/watertempthermalsums.csv?token=AL4COXLYFSOPERB77IOGIVS634CVY"))
+
+tempandthermalsums<-as.data.frame(tempandthermalsums)
 tempandthermalsums$Date <- as.Date(tempandthermalsums$Date, "%Y-%m-%d")
 
 
@@ -148,7 +159,7 @@ Make more models with 1 to 4 predictors. Then take the best models (AIC <2) and 
 4) dredge function on the scaled data subset the modesl <2
 5) Make the averaged model. == Table S4(?) in the Manuscript
 
-Make a bunch of models to predict biofilm productivity 
+Make models to predict biofilm productivity 
 ```{r make biofilm productivity models}
 
 
@@ -180,38 +191,7 @@ bestmodelsetnoscale3<-subset(dredgedmodelsallupto4noscale3, delta <2)
 dredgedmodelsallupto4scale3 <- dredge(fullscaled, subset=smat3, m.lim=c(1,4))
 
 
-#plot them#
-##add column Pond2##
-allvariablesbypond2<- allvariablesbypond %>% mutate(Pond2=Pond)
-  
-allvariablesbypond2$Pond2<- plyr::revalue(allvariablesbypond2$Pond2, c("East"="1", "NoOil"="1a", "Oil"="1b", "Golf"="1c", "Waterfall"="2a", "Vulgaris"="3", "Vulgaris.small"="3a", "Ice"="4"))
-
-
-FoodqualitypondmetricsPCAscores2<- FoodqualitypondmetricsPCAscores %>% mutate(Pond2=Pond)
-  
-FoodqualitypondmetricsPCAscores2$Pond2<- plyr::revalue(FoodqualitypondmetricsPCAscores2$Pond2, c("East"="1", "NoOil"="1a", "Oil"="1b", "Golf"="1c", "Waterfall"="2a", "Vulgaris"="3", "Vulgaris.small"="3a", "Ice"="4"))
-
-mytheme<- theme_bw()+ theme(axis.line.x= element_line(colour = "black", size=0.3))+theme(axis.line.y= element_line(colour = "black", size=0.3))+theme(axis.text.x=element_text(size=8, colour = "black"))+theme(axis.text.y=element_text(size=8, colour = "black"))+theme(axis.title=element_text(size=9))+theme(plot.title=element_text(size=7) +theme(plot.title = element_text(hjust = 0.5)))+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-
-
-Perimeterplot<-ggplot(allvariablesbypond2, aes(x=Perim_avg, y=Prod.ug.cm.day)) + geom_point(size=1)+geom_text(aes(label=Pond2),position=position_nudge(y=-0.1), size=2)+xlab(bquote(atop("Pond perimeter" (m^{2}))))+ylab(bquote(atop("Biofilm productivity" , ( ~ μg  ~C %.%  ~ cm^{-2} %.% ~day^{-1}))))+ggtitle("")+ stat_smooth(method="lm", se=FALSE, color = "black")+ mytheme+xlim(30, 300)+ylim(-1, 6)
-
-TotalPplot<-ggplot(FoodqualitypondmetricsPCAscores2, aes(x=meanlogTotalP, y=PC1)) + geom_point(size=1)+geom_text(aes(label=Pond2),position=position_nudge(y=-0.1), size=2)+xlab(bquote(atop("ln(Total P (µg/ L))")))+ylab("PC1: Food quality")+ggtitle("")+ stat_smooth(method="lm", se=FALSE, color = "black")+ mytheme+ylim(-4, 3)+xlim(1.25, 3.75)
-
-
-png("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/Perimeterproductivity.png", width = 4, height = 4, units = 'in', res = 800)
-Perimeterplot
-dev.off()
-
-
-png("C:/Users/Mitzi/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Outputs/Foodqualityandquanity.png", width = 8, height = 4, units = 'in', res = 800)
-grid.arrange(Perimeterplot, TotalPplot, ncol=2, widths = c(1.06,1))
-dev.off()
-
-
-Perimetermodel<-lm(Prod.ug.cm.day~Perim_avg, data=allvariablesbypond)
-
-
+###best model for predicting biofilm productivity is with perimeter##s
 
 ```
 
