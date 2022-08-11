@@ -1,0 +1,1532 @@
+---
+title: "Adult mosquito spatial and temporal distributions"
+author: "Melissa DeSiervo"
+date: "5/31/2020"
+output: html_document
+---
+
+
+Install necessary packages
+```{r Upload packages}
+library(dplyr)
+library(tidyr)
+library(lme4)
+library(ggplot2)
+library(scales)
+library(gridExtra)
+library(reshape2)
+library(emmeans) # v. 1.3.3
+library(magrittr) # v. 1.5
+library(lemon)
+library(lubridate)
+library(nlme)
+library(MASS)
+library(pscl)
+library(R2admb)
+library(glmmADMB)
+library(glmmTMB)
+library(insight)
+library(performance)
+library(spatstat)
+library(here)
+#library(modEvA)
+
+base_breaks <- function(n = 10){
+    function(x) {
+        axisTicks(log10(range(x, na.rm = TRUE)), log = TRUE, n = n)
+    }
+}
+
+```
+
+
+
+```{r AIC function}
+
+
+##aic function###
+aictable<-function(X,m){
+  #
+  #  This function will create a full model selection table based on AICc.
+  #  
+  #  Inputs:
+  #
+  #  X is the AIC table produced by R by using AIC(model1,model2, ...)
+  #  m is the sample size
+  #
+  #
+  rnames<-row.names(X)
+  AICc<-X$AIC+2*X$df*(X$df+1)/(m-X$df-1)     #small-sample correction
+  logL<-X$df-X$AIC/2                         #Log-likelihood
+  tab<-data.frame(X[,1],logL,AICc)           #Remove AIC column; add logL and AICc
+  colnames(tab)[1]<-c("Params")              #Rename "df" column   
+  row.names(tab)<-rnames
+  tab<-tab[order(tab$AICc),]                 #Sort by ascending AICc value
+  deltaAICc<-tab$AICc-min(tab$AICc)          #Delta AICc
+  weight<-exp(-deltaAICc/2)/sum(exp(-deltaAICc/2))  #Weights
+  cumwt<-weight                              #Column for cumulative weight
+  for(i in 2:dim(X)[1]){                  
+    cumwt[i]<-cumwt[i-1]+cumwt[i]              #Accumulate weight from the top
+  }
+  tab<-data.frame(tab,deltaAICc,weight,cumwt)
+  tab<-round(tab,4)
+  tab
+}
+
+
+```
+
+
+```{r R2 functions for glmmTMB}
+
+####from github### https://github.com/glmmTMB/glmmTMB/blob/master/glmmTMB/inst/misc/rsqglmm.R
+
+## utility functions
+
+##' extract the 'conditional-model' term from a glmmTMB object;
+##' otherwise, return x unchanged
+collapse_cond <- function(x)
+    if (is.list(x) && "cond" %in% names(x)) x[["cond"]] else x
+
+##' Cleaned-up/adapted version of Jon Lefcheck's code from SEMfit;
+##' also incorporates some stuff from MuMIn::rsquaredGLMM.
+##' Computes Nakagawa/Schielzeth/Johnson analogue of R^2 for
+##' GLMMs. Should work for [g]lmer(.nb), glmmTMB models ...
+##'
+##' @param model a fitted model
+##' @return a list composed of elements "family", "link", "marginal", "conditional"
+my_rsq <- function(model) {
+
+    ## get basics from model (as generally as possible)
+    vals <- list(
+        beta=fixef(model),
+        X=getME(model,"X"),
+        vc=VarCorr(model),
+        re=ranef(model))
+
+    ## glmmTMB-safety
+    if (is(model,"glmmTMB")) {
+        vals <- lapply(vals,collapse_cond)
+        nullEnv <- function(x) {
+            environment(x) <- NULL
+            return(x)
+        }
+        if (!identical(nullEnv(model$modelInfo$allForm$ziformula),nullEnv(~0)))
+            warning("R2 ignores effects of zero-inflation")
+        dform <- nullEnv(model$modelInfo$allForm$dispformula)
+        if (!identical(dform,nullEnv(~1)) &&
+            (!identical(dform,nullEnv(~0))))
+            warning("R2 ignores effects of dispersion model")
+    }
+    
+    ## Test for non-zero random effects
+    if (any(sapply(vals$vc, function(x) any(diag(x)==0)))) {
+        ## FIXME: test more generally for singularity, via theta?
+        stop("Some variance components equal zero. Respecify random structure!")
+    }
+
+    ## set family/link info
+    ret <- list()
+    if (is(model,"glmmTMB") || is(model,"glmerMod")) {
+        ret$family <- family(model)$family
+        ret$link <- family(model)$link
+    } else {
+        ret$family <- "gaussian"; ret$link <- "identity"
+    }
+
+    ## Get variance of fixed effects: multiply coefs by design matrix
+    varF <- with(vals,var(as.vector(beta %*% t(X))))
+
+    ## Are random slopes present as fixed effects? Warn.
+    random.slopes <- if("list" %in% class(vals$re)) {
+                         ## multiple RE
+                         unique(c(sapply(vals$re,colnames)))
+                     } else {
+                         colnames(vals$re)
+                     }
+    if (!all(random.slopes %in% names(vals$beta))) 
+        warning("Random slopes not present as fixed effects. This artificially inflates the conditional R2. Respecify fixed structure!")
+      
+    ## Separate observation variance from variance of random effects
+    nr <- sapply(vals$re, nrow)
+    not.obs.terms <- names(nr[nr != nobs(model)])
+    obs.terms <- names(nr[nr==nobs(model)])
+
+    ## Compute variance associated with a random-effects term
+    ## (Johnson 2014)
+    getVarRand <- function(terms) {
+        sum(
+            sapply(vals$vc[terms],
+                   function(Sigma) {
+                Z <- vals$X[, rownames(Sigma), drop = FALSE]
+                Z.m <- Z %*% Sigma
+                return(sum(diag(crossprod(Z.m, Z))) / nobs(model))
+            } )
+        )
+    }
+    
+    ## Variance of random effects 
+    varRand <- getVarRand(not.obs.terms)
+
+    if (is(model,"lmerMod") ||
+        (ret$family=="gaussian" && ret$link=="identity")) {
+        ## Get residual variance
+        varDist <- sigma(model)^2
+        varDisp <- 0
+    } else {
+        varDisp <- if (length(obs.terms)==0) 0 else getVarRand(obs.terms)
+    
+        badlink <- function(link,family) {
+            warning(sprintf("Model link '%s' is not yet supported for the %s distribution",link,family))
+            return(NA)
+        }
+
+        if(ret$family == "binomial") {
+            varDist <- switch(ret$link,
+                              logit=pi^2/3,
+                              probit=1,
+                              badlink(ret$link,ret$family))
+        } else if (ret$family == "poisson" ||
+                   grepl("nbinom",ret$family) ||
+                   grepl("Negative Binomial", ret$family)) {
+            ## Generate null model (intercept and random effects only, no fixed effects)
+
+            ## https://stat.ethz.ch/pipermail/r-sig-mixed-models/2014q4/023013.html
+            ## FIXME: deparse is a *little* dangerous
+            rterms <- paste0("(",sapply(findbars(formula(model)),deparse),")")
+            nullform <- reformulate(rterms,response=".")
+            null.model <- update(model,nullform)
+
+            ## from MuMIn::rsquaredGLMM
+
+            ## Get the fixed effects of the null model
+            null.fixef <- unname(collapse_cond(fixef(null.model)))
+
+            ## in general want log(1+var(x)/mu^2)
+            logVarDist <- function(null.fixef) {
+                mu <- exp(null.fixef)
+                if (mu < 6)
+                    warning(sprintf("mu of %0.1f is too close to zero, estimate may be unreliable \n",mu))
+                vv <- switch(ret$family,
+                            poisson=mu,
+                            nbinom1=,
+                            nbinom2=family(model)$variance(mu,sigma(model)),
+                            if (is(model,"merMod"))
+                                mu*(1+mu/getME(model,"glmer.nb.theta"))
+                            else mu*(1+mu/model$theta))
+                cvsquared <- vv/mu^2
+                return(log1p(cvsquared))
+            }
+
+            varDist <- switch(ret$link,
+                              log=logVarDist(null.fixef),
+                              sqrt=0.25,
+                              badlink(ret$link,ret$family))
+        }
+    }
+    ## Calculate R2 values
+    ret$Marginal = varF / (varF + varRand + varDisp + varDist)
+    ret$Conditional = (varF + varRand) / (varF + varRand + varDisp + varDist)
+    return(ret)
+}
+
+if (FALSE) {
+    fm1 <- lmer(Reaction~Days+(Days|Subject),data=sleepstudy)
+    fm2 <- glmmTMB(Reaction~Days+(Days|Subject),data=sleepstudy)
+    my_rsq(fm1)
+    my_rsq(fm2)
+
+    ## devtools::install_github("jslefche/piecewiseSEM")
+    library(piecewiseSEM)
+    sem.model.fits(fm1)  ## same answer
+
+    fm3 <- glmer(incidence/size~period+(1|herd),cbpp,
+                 family=binomial,weights=size)
+    fm4 <- glmmTMB(incidence/size~period+(1|herd),cbpp,
+                   family=binomial,weights=size)
+    my_rsq(fm3)
+    my_rsq(fm4)
+
+    fm5 <- glmer.nb(TICKS~YEAR+scale(HEIGHT)+(1|BROOD),grouseticks)
+    fm6 <- glmmTMB(TICKS~YEAR+scale(HEIGHT)+(1|BROOD),grouseticks,family=nbinom2)
+    my_rsq(fm5)
+    my_rsq(fm6)
+}
+
+## Tjur's coeff of determination, from sjmisc ... ????
+## only does Bernoulli responses ???
+cod <- function(x) {
+    y <- model.response(model.frame(x))
+    pred <- predict(fm,type="response")
+    if (anyNA(rr <- residuals(x)))
+        pred <- pred[!is.na(rr)]
+    categories <- unique(y)
+    m1 <- mean(pred[which(y == categories[1])], na.rm = TRUE)
+    m2 <- mean(pred[which(y == categories[2])], na.rm = TRUE)
+    cod <- abs(m2 - m1)
+    return(cod)
+}
+
+
+
+```
+
+
+#######UPLOAD DATA###########
+
+```{r upload emergence trap data 2018}
+
+emergencetraps<-read.csv(here("Adultmosquitoes/data/Emergence_number_2018.csv"))
+
+emergencetraps$Start.date <- as.Date(emergencetraps$Start.date, "%m/%d/%Y")
+emergencetraps$Date.collected <- as.Date(emergencetraps$Date.collected, "%m/%d/%Y")
+
+emergencetraps<-emergencetraps %>% mutate(Sitecode=Pond.1)
+
+
+
+```
+
+
+```{r Upload CO2 data 2017 2018 and fix date formats}
+
+##c02##
+
+CO2counts20172018<- read.csv("Adultmosquitoes/data/C02counts_weather2017_2018.csv") 
+
+#### wind speeds were updated from 2018 to be in the same units as 2017###
+## on 7/20/21 I added topographic roughness values from RAF,...###
+
+
+
+CO2counts20172018$Year <- as.factor(CO2counts20172018$Year)
+CO2counts20172018$Date<-as.Date(CO2counts20172018$Date, format = "%m/%d/%Y") 
+CO2counts20172018$Date2<-as.Date(CO2counts20172018$Date2, format = "%m/%d/%Y") 
+
+
+
+C02sitechar<- read.csv("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/C02traps/C02sitechar.csv")
+
+C02sitechar$Site2 <- as.factor(C02sitechar$Site2)
+
+#### subset out Golf and Kforest because of potential faulty trap issues###
+
+
+CO2counts20172018subset<-CO2counts20172018 %>%   filter(SiteYear!= "Golf2018") %>%   filter(SiteYear!= "Forest2018")
+
+
+levels(CO2counts20172018subset$Site)
+
+
+CO2counts20172018subset<- CO2counts20172018subset %>% mutate(Sitecode=Site)
+
+CO2counts20172018subset$Sitecode<-plyr::mapvalues(CO2counts20172018subset$Sitecode, c("Airport", "Bunny", "Camp", "Dispersal", "East", "Forest", "Golf", "KISS", "Moz valley", "Oil", "Seatomato", "Vulgaris", "VV2", "Waterfall", "Waterfall up"), c("F1a", "F3b", "F2a", "F3a", "1", "F1c", "1c", "F1b", "F3c", "1b", "F2b", "3", "F3d", "2a", "F2c"))
+
+```
+
+
+```{r upload sweep net data 2018}
+##Sweep net 2018## ##from each sweep individual##
+
+
+sweep2018<- read.csv("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Sweepnet/2018/Sweep2018.csv")
+
+sweep2018$Date<-as.Date(sweep2018$Date, format = "%m/%d/%Y") 
+
+sweep2018_2<-sweep2018%>% mutate(Jdate=yday(sweep2018$Date))
+
+sweep2018$Sample<-as.factor(sweep2018$Sample)
+sweep2018$Site2<-as.factor(sweep2018$Site2)
+
+sweep2018$Samplingevent<-as.factor(sweep2018$Samplingevent)
+
+sweep2018<- sweep2018 %>% mutate(Sitecode=Pond)
+
+sweep2018$Sitecode<-plyr::mapvalues(sweep2018$Sitecode, c("East", "Golf", "Ice", "NoOil", "Oil", "Vulgaris", "Vulgarissmall", "Waterfall"), c("1", "1c", "4", "1a", "1b", "3", "3a", "2a"))
+
+
+
+```
+
+```{r upload larval data 2018}
+
+invertcounts2018<- read.csv("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/invertcountsperimemerg2018.csv")
+invertcounts2018$Date <- as.Date(invertcounts2018$Date, "%m/%d/%Y")
+
+
+### 350ml * 5 = 1.75L##
+invertcounts20182<-invertcounts2018 %>% dplyr::select(Date, Site, Pond2, Total, Colymlarv, PondPerimeter:Larvalstage2) %>% mutate(Totalliter = Total/1.75, Colyliter=Colymlarv/1.75)%>% mutate(logTotalliter = log(Totalliter+1), logColyliter=log(Colyliter+1))
+
+####subset to just N0###
+
+N0dens<-subset(invertcounts20182, Larvalstage2=="N0")
+
+
+###
+
+summarydensitybyliter<-invertcounts20182 %>% group_by(Site, Pond2, Date,Emergence, Larvalstage2, PondPerimeter, Depth_1, Length_1.5) %>% dplyr::summarise(n=n(), meanTotalliter=mean(Totalliter, na.rm=TRUE),sdTotalliter=sd(Totalliter, na.rm=TRUE),seTotalliter=(sdTotalliter/sqrt(n)), meanbeetleTotalliter=mean(Colyliter, na.rm=TRUE),sdbeetleliter=sd(Colyliter, na.rm=TRUE),meanlogTotalliter=mean(logTotalliter, na.rm=TRUE),sdlogTotalliter=sd(logTotalliter, na.rm=TRUE), selogTotalliter=(sdlogTotalliter/sqrt(n)),meanlogbeetleTotalliter=mean(logColyliter, na.rm=TRUE),sdlogbeetleliter=sd(logColyliter, na.rm=TRUE))
+
+summaryN0density_1<-subset(summarydensitybyliter, Larvalstage2=="N0")  
+summaryN0density<-summaryN0density_1 %>% ungroup()%>% dplyr::select(c(Site, Pond2, Date, meanTotalliter, seTotalliter,  meanlogTotalliter, selogTotalliter))
+
+
+```
+
+
+
+#########CALCULATING AVERAGES / CUMULATIVE BY SITE############
+
+```{r emergence traps totals by site}
+
+##data cleaning###
+
+#make the NAs be the average by date##
+emergencetrapcumulative2<-emergencetraps %>% group_by(Pond,Date.collected) %>% mutate(Total2=replace(Total, is.na(Total), mean(Total, na.rm=TRUE)),logTotal2=log(1+Total2))
+
+##calculate the cumulative numbers at each trap##
+emergencetrapcumulative3<-emergencetrapcumulative2  %>% group_by(Pond, SS)%>% arrange(Pond, SS, Date.collected)%>% dplyr::mutate(cumemerg2=cumsum(Total2),logcumemerg2=log(1+cumemerg2))
+
+
+##filter to just have the cumulative number at each trap##
+emergencebysamplingstation<-emergencetrapcumulative3 %>% group_by(Pond, SS) %>% filter(Date.collected==max(Date.collected))
+
+
+
+#### boxplot of emergence trap data###
+
+mytheme<- theme_bw()+ theme(axis.line.x= element_line(colour = "black", size=0.3))+theme(axis.line.y= element_line(colour = "black", size=0.3))+theme(axis.text.x=element_text(size=10, colour = "black"))+theme(axis.text.y=element_text(size=10, colour = "black"))+theme(axis.title=element_text(size=10))+theme(plot.title=element_text(size=7) +theme(plot.title = element_text(hjust = 0.5)))+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ theme(legend.position = "none")
+
+
+
+emergencybypond2018<-emergencebysamplingstation %>%
+  ggplot(aes(x=Sitecode, y=cumemerg2)) +
+    geom_boxplot() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    xlab("Pond")+
+    ylab("Cumulative adults / emergence trap")+
+    mytheme
+    
+
+
+
+
+
+
+
+
+```
+
+
+```{r N0 larval density by site}
+
+### 350ml * 5 = 1.75L##
+invertcounts20182<-invertcounts2018 %>% dplyr::select(Date, Site, Pond2, Total, Colymlarv, PondPerimeter:Larvalstage2) %>% mutate(Totalliter = Total/1.75, Colyliter=Colymlarv/1.75)%>% mutate(logTotalliter = log(Totalliter+1), logColyliter=log(Colyliter+1))
+
+summarydensitybyliter<-invertcounts20182 %>% group_by(Site, Pond2, Date,Emergence, Larvalstage2, PondPerimeter, Depth_1, Length_1.5) %>% dplyr::summarise(n=n(), meanTotalliter=mean(Totalliter, na.rm=TRUE),sdTotalliter=sd(Totalliter, na.rm=TRUE),seTotalliter=(sdTotalliter/sqrt(n)), meanbeetleTotalliter=mean(Colyliter, na.rm=TRUE),sdbeetleliter=sd(Colyliter, na.rm=TRUE),meanlogTotalliter=mean(logTotalliter, na.rm=TRUE),sdlogTotalliter=sd(logTotalliter, na.rm=TRUE), selogTotalliter=(sdlogTotalliter/sqrt(n)),meanlogbeetleTotalliter=mean(logColyliter, na.rm=TRUE),sdlogbeetleliter=sd(logColyliter, na.rm=TRUE))
+
+summaryN0density_1<-subset(summarydensitybyliter, Larvalstage2=="N0")  
+summaryN0density<-summaryN0density_1 %>% ungroup()%>% dplyr::select(c(Site, Pond2, Date, meanTotalliter, seTotalliter,  meanlogTotalliter, selogTotalliter))
+
+
+```
+
+
+```{r C02 peak part of season clement weather}
+
+
+CO2counts20172018cumsum<-CO2counts20172018subset %>%group_by(Sitecode, SiteYear)  %>%   mutate(cumsum= cumsum(Countperhour))
+
+###subset to just the 2018 data for now, because in 2017 I didn't have all traps on at the same time in the early part of the season##
+
+CO2counts2018cumsum<-subset(CO2counts20172018cumsum, Year=="2018")
+
+
+## remove inclement weather##
+
+CO2counts2018subset_2<-CO2counts2018cumsum%>%mutate(Weathercat=ifelse(Wspeedmps > 6.5 | TempC <8, "Inclement", "Clement"))
+
+CO2counts2018subset_3<-subset(CO2counts2018subset_2, Weathercat=="Clement")
+
+#filter dates in the peak part of season##
+CO2counts2018subset_4<-CO2counts2018subset_3 %>% filter(Date2 >= as.Date("2017-06-15"))%>% filter(Date2 <= as.Date("2017-07-01"))
+
+
+
+
+#### boxplot of C02 trap data peak season###
+
+mytheme<- theme_bw()+ theme(axis.line.x= element_line(colour = "black", size=0.3))+theme(axis.line.y= element_line(colour = "black", size=0.3))+theme(axis.text.x=element_text(size=10, colour = "black"))+theme(axis.text.y=element_text(size=10, colour = "black"))+theme(axis.title=element_text(size=10))+theme(plot.title=element_text(size=7) +theme(plot.title = element_text(hjust = 0.5)))+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ theme(legend.position = "none")
+
+
+
+Co2sites2018<-CO2counts2018subset_4 %>%
+  ggplot(aes(x=Site, y=Countperhour)) +
+    geom_boxplot() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    xlab("Site")+
+    ylab("Count per hour in CO2 traps")+
+    mytheme
+    
+
+
+jpeg("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/emergencybypond2018.jpeg",width = 4, height = 3,units = 'in', res = 600)
+emergencybypond2018
+dev.off()
+
+
+
+
+
+```
+
+
+```{r sweep totals by site 2018}
+
+##Sweep net 2018## ##from each sweep individual##
+
+head(sweep2018)
+
+
+##First, sum up the total number caught in 6 sweeps per site per date###
+
+sweep2018sitedate<-sweep2018 %>% group_by(SiteYear, Date) %>% summarise(Total= sum(Total), Gravid = sum(Gravid))
+
+
+####then calculate the cumulative number caught per site##
+
+sweepcumulative<-sweep2018sitedate %>% group_by(SiteYear) %>% dplyr::mutate(cumTotal=cumsum(Total),cumGravid=(Gravid))
+
+####
+
+##plot of total number of mosquitoes caught in sweep nets cumulatively over season##
+
+mytheme<- theme_bw()+ theme(axis.line.x= element_line(colour = "black", size=0.3))+theme(axis.line.y= element_line(colour = "black", size=0.3))+theme(axis.text.x=element_text(size=10, colour = "black"))+theme(axis.text.y=element_text(size=10, colour = "black"))+theme(axis.title=element_text(size=10))+theme(plot.title=element_text(size=7) +theme(plot.title = element_text(hjust = 0.5)))+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ theme(legend.position = "none")
+
+ 
+sweep2018cumsum<-ggplot(sweepcumulative, aes(Date, cumTotal, color=SiteYear)) + geom_point(na.rm=TRUE)+ geom_line(na.rm=TRUE)+xlab("")+ylab(bquote(atop("Cumulative" , (Total / sweeps))))+mytheme
+
+#ANOTHER WAY TO DO CUMULATIVE SUMS###
+
+##Sum up the total number caught in each sweep rep by date###
+
+sweep2018sitedate_2<-sweep2018 %>% group_by(Sitecode, SiteYear, Sample) %>% summarise(Total= sum(Total), Gravid = sum(Gravid))
+
+
+####then standardize to the number of dates###
+
+
+sweep2018sitedate_3<-sweep2018sitedate_2 %>% mutate(numdates=SiteYear)
+
+sweep2018sitedate_3$numdates<-plyr::mapvalues(sweep2018sitedate_3$numdates, c("East2018", "Golf2018", "Ice2018", "NoOil2018", "Oil2018", "Vulgaris2018", "Vulgarissmall2018", "Waterfall2018"), c("3", "4", "4", "4", "4", "4", "4", "4"))
+
+sweep2018sitedate_3$numdates<-as.numeric(as.character(sweep2018sitedate_3$numdates))
+
+sweep2018sitedate_4<-sweep2018sitedate_3%>%mutate(Totaladjust=round((Total/numdates)*mean(sweep2018sitedate_3$numdates)))%>%mutate(Gravidadjust=round((Gravid/numdates)*mean(sweep2018sitedate_3$numdates)))
+
+
+
+
+
+```
+
+
+```{r cumulative sums for each life stage 1 number per site}
+
+##https://cran.r-project.org/web/packages/GlmSimulatoR/vignettes/count_data_and_overdispersion.html##
+
+#####cumulative number in emerg traps####1 number per site###adjusted # traps###
+
+head(emergencebysamplingstation)
+
+##average for one trap###
+
+ emer1trap<-emergencebysamplingstation %>%group_by(Pond) %>% dplyr::summarise(n=n(), meanemerg=mean(cumemerg2 , na.rm=TRUE), sdemerg = sd(cumemerg2 ), seemer = sdemerg/sqrt(n))
+
+ ##total all traps##
+emerwholepond<-emergencebysamplingstation %>%group_by(Pond) %>% dplyr::summarise(n=n(), sumemerg=sum(cumemerg2 , na.rm=TRUE))
+  
+emerwholepond2<-emerwholepond %>%  mutate(standemerg=(sumemerg/n)*mean(emerwholepond$n))
+
+#####cumulative number in c02 traps ####1 number per site### ##adjusted hours in CO2traps###
+
+
+###subset to just the 2018 data##
+
+CO2counts2018subset <-subset(CO2counts20172018subset, Year=="2018")
+
+## remove inclement weather##
+
+CO2counts2018subset_2<-CO2counts2018subset%>%mutate(Weathercat=ifelse(Wspeedmps > 6.5 | TempC <8, "Inclement", "Clement"))
+
+CO2counts2018subset_3<-subset(CO2counts2018subset_2, Weathercat=="Clement")
+
+#filter dates in the peak part of season##
+CO2counts2018subset_4<-CO2counts2018subset_3 %>% filter(Date2 >= as.Date("2017-06-15"))%>% filter(Date2 <= as.Date("2017-07-01"))
+
+CO2counts2018_cumsum<-CO2counts2018subset_4 %>%group_by(SiteYear)  %>%   mutate(cumsum= cumsum(Count)) %>%   mutate(cumhours= cumsum(Hours))
+
+CO2counts2018_cumsum_bysite<-CO2counts2018_cumsum %>% group_by(Site) %>% filter(cumhours==max(cumhours)) %>% dplyr::select(Date, Site, SiteYear, Larvhab500m, DistRus, cumsum, cumhours)%>%mutate(cumsumadjust=(cumsum/cumhours)*mean(CO2counts2018_cumsum$cumhours))
+
+
+
+#####cumulative number in sweep nets ####1 number per site### ##adjusted to number of date sampeled ###
+
+head(sweepcumulative)
+
+sweepcumulative_2<-sweepcumulative %>%group_by(SiteYear) %>% filter(cumTotal==max(cumTotal))  
+
+numdates<-c(3,4,4,4,4,4,4,4)##number of dates each site was sampeled (bc East was sampeled 3 instead of 4 times)
+
+sweepcumulative_3<-cbind(sweepcumulative_2, numdates=numdates)
+
+sweepcumulative_4<-sweepcumulative_3%>%mutate(cumsumTotoladjust=round((cumTotal/numdates)*mean(sweepcumulative_3$numdates)))%>%mutate(cumsumTGravidadjust=round((cumGravid/numdates)*mean(sweepcumulative_3$numdates)))
+
+#####cumulative number gravid in sweep nets ####1 number per site### ##adjusted to number of date sampeled ###
+
+
+
+```
+
+
+
+```{r cumulative sums dispersion test}
+
+##https://cran.r-project.org/web/packages/GlmSimulatoR/vignettes/count_data_and_overdispersion.html##
+#https://stats.stackexchange.com/questions/10419/what-is-theta-in-a-negative-binomial-regression-fitted-with-r##
+#http://biometry.github.io/APES//LectureNotes/2016-JAGS/Overdispersion/OverdispersionJAGS.html#
+
+#####emergtraps###
+emer1trap$meanemerg
+emerwholepond$standemerg
+
+####c02 traps###
+CO2counts2018_cumsum_bysite$cumsumadjust
+
+#####cumulative number in sweep nets 
+sweepcumulative_4$cumsumTotoladjust
+
+#####cumulative gravid in sweep nets 
+sweepcumulative_4$cumsumTGravidadjust
+
+
+###test poisson versus NB for each life stage###
+
+## emer traps###
+poisemerg <- glm(round(meanemerg) ~ 1, data = emer1trap, family = poisson)
+poisemerg2 <- glm(round(standemerg) ~ 1, data = emerwholepond, family = poisson)
+
+nbemerg <- glm.nb(round(meanemerg) ~ 1, data = emer1trap, control=glm.control(maxit=100))
+
+rawaic<-AIC(poisemerg,nbemerg )
+nR<-dim(emergtotal_3)[1]  #Sample size 
+aictable(rawaic,nR) ###NB is better for emergence trap data###
+
+
+## CO2###
+poisCo2 <- glm(round(cumsumadjust) ~ 1, data = CO2counts2018_cumsum_bysite, family = poisson)
+nbCo2 <- glm.nb(round(cumsumadjust) ~ 1, data = CO2counts2018_cumsum_bysite, control=glm.control(maxit=100))
+
+rawaic<-AIC(poisCo2 ,nbCo2 )
+nR<-dim(CO2counts2018_cumsum_bysite)[1]  #Sample size 
+aictable(rawaic,nR) ###NB is better for CO2###
+
+
+## Sweeps###
+poissweep<- glm(cumsumTotoladjust ~ 1, data = sweepcumulative_4, family = poisson)
+nbsweep <- glm.nb(cumsumTotoladjust ~ 1, data = sweepcumulative_4, control=glm.control(maxit=100))
+
+rawaic<-AIC(poissweep ,nbsweep )
+nR<-dim(sweepcumulative_4)[1]  #Sample size 
+aictable(rawaic,nR) ###NB is better for sweeps###
+
+## Sweeps Gravid ###
+poissweepgravid<- glm(cumsumTGravidadjust ~ 1, data = sweepcumulative_4, family = poisson)
+nbsweepgravid <- glm.nb(cumsumTGravidadjust ~ 1, data = sweepcumulative_4, control=glm.control(maxit=100))
+
+rawaic<-AIC(poissweepgravid ,nbsweepgravid)
+nR<-dim(sweepcumulative_4)[1]  #Sample size 
+aictable(rawaic,nR) ###NB is better for gravids####
+
+#####NEGATIVE BINOMIAL IS THE BEST FIT FOR ALL LIFE STAGES####
+
+
+nbemerg <- glm.nb(round(meanemerg) ~ 1, data = emer1trap, control=glm.control(maxit=100))
+nbCo2 <- glm.nb(cumsumadjust ~ 1, data = CO2counts2018_cumsum_bysite, control=glm.control(maxit=100))
+nbsweep <- glm.nb(cumsumTotoladjust ~ 1, data = sweepcumulative_4, control=glm.control(maxit=100))
+nbsweepgravid <- glm.nb(cumsumTGravidadjust ~ 1, data = sweepcumulative_4, control=glm.control(maxit=100))
+
+###CALCULATING THE SKEW###
+#https://stats.stackexchange.com/questions/10419/what-is-theta-in-a-negative-binomial-regression-fitted-with-r##
+
+
+emergskew<-(1+2*(mean(emer1trap$meanemerg)/nbemerg$theta))/(sqrt(mean(emer1trap$meanemerg)*(1+(mean(emer1trap$meanemerg)/nbemerg$theta))))
+
+
+Co2skew<-(1+2*(mean(CO2counts2018_cumsum_bysite$cumsumadjust)/nbCo2$theta))/(sqrt(mean(CO2counts2018_cumsum_bysite$cumsumadjust)*(1+(mean(CO2counts2018_cumsum_bysite$cumsumadjust)/nbCo2$theta))))
+
+sweepskew<-(1+2*(mean(sweepcumulative_4$cumsumTotoladjust)/nbsweep$theta))/(sqrt(mean(sweepcumulative_4$cumsumTotoladjust)*(1+(mean(sweepcumulative_4$cumsumTotoladjust)/nbsweep$theta))))
+
+
+gravidskew<-(1+2*(mean(sweepcumulative_4$cumsumTGravidadjust)/nbsweepgravid$theta))/(sqrt(mean(sweepcumulative_4$cumsumTGravidadjust)*(1+(mean(sweepcumulative_4$cumsumTGravidadjust)/nbsweepgravid$theta))))
+
+
+emergskew
+Co2skew
+sweepskew
+gravidskew
+
+##dispersion test##NEED TO USE THE POISSON###
+
+library(pscl)
+library(DHARMa)
+
+dispersiontest(poisemerg, trafo=2) ##trafo = 2 bc Negative binomial model assumes variance is a quadratic function of the mean.##
+#dispersiontest(poisemerg2)
+dispersiontest(poisCo2, trafo=2)
+dispersiontest(poissweep, trafo=2)
+dispersiontest(poissweepgravid, trafo=2)
+
+####
+
+
+```
+
+
+
+
+##########GLMMS################
+
+
+```{r emergence traps glms}
+
+####
+
+
+modelemergnb<-glmmTMB(round(cumemerg2) ~ Pond,  family=nbinom1(link="log"), data=emergencebysamplingstation)  
+modelemergnb2<-glmmTMB(round(cumemerg2) ~ Pond,  family=nbinom2(link="log"), data=emergencebysamplingstation)  
+
+modelemergpois<-glmmTMB(round(cumemerg2) ~ Pond,  family=poisson(link="log"), data=emergencebysamplingstation)  
+
+AIC(modelemergnb, modelemergnb2, modelemergpois) ## NB model is way better### ##NB2 is better than NB 1 ###
+
+###check with performance package###
+
+check_overdispersion(modelemergpois)  ###Poisson model is way overdispersed  ######
+check_zeroinflation(modelemergpois)
+check_singularity(modelemergpois)
+
+check_overdispersion(modelemergnb)  ###overdispersion is better with nbinom1  ######
+check_zeroinflation(modelemergnb)
+check_singularity(modelemergnb)
+
+
+check_overdispersion(modelemergnb2)  ###overdispersion is even better with nbinom2  ######
+check_zeroinflation(modelemergnb2)
+check_singularity(modelemergnb2)
+
+
+
+###Model results for table###
+
+summary(modelemergnb2)
+glmmTMB:::Anova.glmmTMB(modelemergnb2)
+
+my_rsq(modelemergnb2)
+
+lsmeans(modelemergnb2, ~Pond, type = "response")
+
+
+```
+
+
+
+```{r sweep GLMs total}
+
+
+head(sweep2018) ##raw data by site and date###
+
+###test for spatial autocorrellation###
+
+model1sweep<-glmmTMB(round(Total) ~ SiteYear,  family=nbinom1(link="log"), data=sweep2018)  
+
+# plot residuals
+sweep2018$resid <- resid(model1sweep)
+
+ggplot(sweep2018, aes(x = Lat, y = Long, size = resid)) +
+  geom_point() +
+  scale_size_continuous(range = c(1,10))
+
+
+
+####
+
+
+sims1 <- simulateResiduals(model1sweep)
+sims22<-recalculateResiduals(sims1, group=sweep2018$SiteYear)
+
+
+x_unique1 <- unique(sweep2018$Lat)
+y_unique1 <- unique(sweep2018$Long)
+
+
+testSpatialAutocorrelation(sims22, x = x_unique1, y = y_unique1)
+
+###check for temporal autocorrellations###
+
+
+model1 <- glm.nb(round(Total)~Date*Site2, data = sweep2018)
+
+acf(model1$residuals, type = "correlation")
+
+####very mild evidence for autocorrellation....####
+
+##Try with sampling event####
+
+model2 <- glm.nb(round(Total)~Samplingevent*Site2, data = sweep2018)
+
+acf(model2$residuals, type = "correlation")
+
+###no real autocorrelation with the sampling event instead of date...###
+
+###doesn't really make sense here to build an autocorrellated model since dates are not evenly spaced...??##
+
+
+
+###trying some mixed effects models####
+
+modelsamplerandom<-glmmTMB(round(Total) ~ SiteYear+ (1|Samplingevent),  family=nbinom1(link="log"), data=sweep2018)  
+
+
+###checking models with performance package####
+
+check_overdispersion(modelsamplerandom)  ###overdispersion accounted for w/ nbinom1 family
+
+check_zeroinflation(modelsamplerandom)  ##Model is underfitting zeros (probable zero-inflation)###
+
+
+###models need zero inflation###
+
+
+modeldaterandomZI<-glmmTMB(round(Total) ~ SiteYear+ (1|Samplingevent),  family=nbinom1(link="log"), ziformula=~SiteYear, data=sweep2018) 
+
+check_overdispersion(modeldaterandomZI)  ###overdispersion accounted for w/ nbinom1 family
+
+check_zeroinflation(modeldaterandomZI) ### is still underestimating zeros...###
+
+
+####USING FAMILY NBINOM 2 helps with zero inflation###
+
+modeldaterandomZI2<-glmmTMB(round(Total) ~ SiteYear+ (1|Samplingevent),  family=nbinom2(link="log"), ziformula=~SiteYear, data=sweep2018) 
+
+modeldaterandom2<-glmmTMB(round(Total) ~ SiteYear+ (1|Samplingevent),  family=nbinom2(link="log"),  data=sweep2018) 
+
+check_overdispersion(modeldaterandomZI2)  ###overdispersion accounted for w/ nbinom1 family
+
+check_zeroinflation(modeldaterandomZI2) ### does a better job with zeros###
+
+check_singularity(modeldaterandomZI2) ##FALSE###
+
+
+
+
+##########Model results for table########
+
+summary(modeldaterandomZI2)
+glmmTMB:::Anova.glmmTMB(modeldaterandomZI2)
+
+my_rsq(modeldaterandomZI2)
+
+
+lsmeans(modeldaterandomZI2, ~SiteYear, type = "response")
+
+#lsmeans(modelsamplerandom, ~SiteYear, type="response") ###you get different estimates, which tells me the zero inflation is being accounted for####
+
+
+```
+
+
+
+```{r sweep GLMs prop gravid}
+
+
+
+
+#######Models for proportion GRAVID###
+
+propgravidZI2<-glmmTMB((Gravid/Total) ~ SiteYear+ (1|Samplingevent), zi=~., family=binomial, data=sweep2018) 
+propgravid<-glmmTMB((Gravid/Total) ~ SiteYear+ (1|Samplingevent), family=binomial, data=sweep2018) 
+
+
+AIC(propgravidZI2, propgravid) ## model without zero inflation is better###
+
+
+####
+check_overdispersion(propgravid)  ###overdispersion accounted for ###
+check_singularity(propgravid) ##TRUE...Hmmmm###
+
+#####Try model with date as a fixed instead of random effect#####
+
+propgravid_norand<-glmmTMB((Gravid/Total) ~ SiteYear+ as.numeric(Samplingevent), family=binomial, data=sweep2018) 
+
+
+AIC(propgravidZI2, propgravid, propgravid_norand) ## model without zero inflation is better###
+
+
+check_overdispersion(propgravid_norand)  ###overdispersion accounted for ###
+check_singularity(propgravid_norand) ##FALSE###
+
+###Model with date as a fixed effect is better...### Print results for both the random and fixed effect models###
+
+
+##########Model results for table  MODEL WITH RANDOM EFFECT########
+
+summary(propgravid)
+glmmTMB:::Anova.glmmTMB(propgravid)
+
+my_rsq(propgravid)
+
+lsmeans(propgravid, ~SiteYear, type = "response")
+
+##########Model results for table  MODEL WITH DATE AS A FIXED EFFECT########
+
+summary(propgravid_norand)
+glmmTMB:::Anova.glmmTMB(propgravid_norand)
+
+my_rsq(propgravid_norand)
+
+lsmeans(propgravid_norand, ~SiteYear, type = "response")
+
+
+
+
+```
+
+
+
+
+```{r GLMs CO2 trap simple spatial, temporal, both, none}
+
+
+temporalmodel <- glm.nb(round(Countperhour)~DaysEmerg, data = CO2counts2018cumsum)
+temporalmodel2 <- glm.nb(round(Countperhour)~DaysEmerg+I(DaysEmerg^2), data = CO2counts2018cumsum)
+spatialmodel <- glm.nb(round(Countperhour)~Site, data = CO2counts2018cumsum)
+tempspatialmodel<- glm.nb(round(Countperhour)~DaysEmerg+I(DaysEmerg^2)+Site, data = CO2counts2018cumsum)
+tempspatialmodel2<- glm.nb(round(Countperhour)~DaysEmerg+I(DaysEmerg^2)+DaysEmerg*Site, data = CO2counts2018cumsum)
+null<-glm.nb(round(Countperhour)~1, data = CO2counts2018cumsum)
+
+
+AIC(temporalmodel, temporalmodel2, spatialmodel, tempspatialmodel, tempspatialmodel2,null)
+
+####
+
+with(summary(temporalmodel), 1 - deviance/null.deviance)
+
+with(summary(temporalmodel2), 1 - deviance/null.deviance)
+
+with(summary(spatialmodel), 1 - deviance/null.deviance)
+
+with(summary(tempspatialmodel), 1 - deviance/null.deviance)
+
+with(summary(tempspatialmodel2), 1 - deviance/null.deviance)
+
+with(summary(null), 1 - deviance/null.deviance)
+
+```
+
+
+
+```{r GLMs CO2 trap: check for spatial autocorrelation}
+
+### First checking for spatial autocorrellation###
+
+model1 <- glm.nb(round(Countperhour)~DaysEmerg, data = CO2counts2018cumsum)
+
+# plot residuals
+CO2counts2018cumsum$resid <- resid(model1)
+
+ggplot(CO2counts2018cumsum, aes(x = Lat, y = Long, size = resid)) +
+  geom_point() +
+  scale_size_continuous(range = c(1,10))
+
+
+sims <- simulateResiduals(model1)
+
+testSpatialAutocorrelation(sims, x = CO2counts2018cumsum$Lat, y = CO2counts2018cumsum$Long, plot = FALSE)
+
+
+####
+
+
+sims <- simulateResiduals(model1)
+sims2<-recalculateResiduals(sims, group=CO2counts2018cumsum$Site2)
+
+
+x_unique <- unique(CO2counts2018cumsum$Lat)
+y_unique <- unique(CO2counts2018cumsum$Long)
+
+
+testSpatialAutocorrelation(sims2, x = x_unique, y = y_unique)
+
+
+####THis tells us that our data are NOT statistically spatially autocorrelated#### 
+
+
+```
+
+
+```{r GLMs CO2 trap: check for temporal autocorrelation}
+
+### First checking for temporal autocorrellation###
+
+model1 <- glm.nb(round(Countperhour)~DaysEmerg, data = CO2counts2018cumsum)
+
+acf(model1$residuals, type = "correlation")
+
+####There is about 0.5 correllation to +1 day and 0.4 correllation to + 2 days##, but not crazy####
+
+##compare models with autocorrellation###
+
+########
+
+modeldateauto<-glmmTMB(round(Countperhour) ~ DaysEmerg+ (1|Site) + ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+
+modeldateauto2<-glmmTMB(round(Countperhour) ~ DaysEmerg+ (1|Site) + ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom2(link="log"), data=CO2counts2018cumsum)  
+
+
+##### models w/ no autocorrellation###
+
+modeldatenoauto <-glmmTMB(round(Countperhour) ~ DaysEmerg+ (1|Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+
+modeldatenoauto2 <-glmmTMB(round(Countperhour) ~ DaysEmerg+ (1|Site),  family=nbinom2(link="log"), data=CO2counts2018cumsum)  
+
+
+AIC(modeldateauto, modeldateauto2,modeldatenoauto,modeldatenoauto2 )  ### The model with autocorrellation with nbinom1 family is the best####
+
+
+### Model diagnostics with performance package####
+
+##icc(fullmodel_scaled)## Tells you the % variance explained by random effect (not working for this model)
+
+check_overdispersion(modeldateauto)  ###overdispersion accounted for w/ nbinom1 family
+
+check_zeroinflation(modeldateauto)  ##Model is underfitting zeros (probable zero-inflation)###
+
+check_singularity(modeldateauto) ### full model has a singular fit (probably because of random effect)#######
+
+
+####THE MODEL WITH AUTOCORRELATION STRUCTURE IS BETTER#####
+
+
+```
+
+
+
+```{r GLMs CO2 trap: check for zero inflation}
+
+###model without zero inflation###
+
+modeldateauto<-glmmTMB(round(Countperhour) ~ DaysEmerg+ (1|Site) + ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+
+modeldateauto2<-glmmTMB(round(Countperhour) ~ DaysEmerg+ (1|Site) + ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom2(link="log"), data=CO2counts2018cumsum)  
+
+
+modeldateautoZI<-glmmTMB(round(Countperhour) ~ DaysEmerg+ (1|Site) + ar1(as.factor(DaysEmerg)+0 |Site),ziformula = ~1, family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+
+modeldateautoZI2<-glmmTMB(round(Countperhour) ~ DaysEmerg+ (1|Site) + ar1(as.factor(DaysEmerg)+0 |Site),ziformula = ~1, family=nbinom2(link="log"), data=CO2counts2018cumsum)  
+
+
+AIC(modeldateauto, modeldateautoZI, modeldateauto2, modeldateautoZI2)
+
+####Model without the zero inflation does better....####
+
+
+### Model diagnostics with performance package####
+
+##icc(fullmodel_scaled)## Tells you the % variance explained by random effect (not working for this model)
+
+check_overdispersion(modeldateauto)  ###overdispersion accounted for w/ nbinom1 family
+
+check_zeroinflation(modeldateauto)  ##Model is underfitting zeros (probable zero-inflation)###
+
+#check_zeroinflation(modeldateautoZI)  ##Model still underfits zeros with zero inflation term###
+
+check_singularity(modeldateauto) ### full model has a singular fit (probably because of random effect)#######
+
+
+####THE MODEL WITH AUTOCORRELATION STRUCTURE BUT WITHOUT ZERO INFLATION IS BETTER#####
+
+
+```
+
+
+
+```{r glmm TMB C02 - AIC spatial, temporal, both w/ temporal autocorrellation}
+
+
+### SPATIAL, TEMPORAL, OR BOTH???###
+
+#SPATIAL##autocorrellated model##### model diagnostics look good####
+
+spatial_auto<-glmmTMB(round(Countperhour) ~ scale(Larvhab500m) +scale(DistRus)+scale(roughraster)+ ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+summary(spatial_auto)
+
+glmmTMB:::Anova.glmmTMB(spatial_auto)
+
+###
+check_singularity(spatial_auto) ##good##
+check_overdispersion(spatial_auto) ##good##
+check_collinearity(spatial_auto) ##good##
+check_zeroinflation(spatial_auto) ##model underfits zeroes###
+
+
+
+TEMPORAL##autocorrellated model##### model diagnostics, ####
+
+
+temporal_auto<-glmmTMB(round(Countperhour) ~ scale(DaysEmerg) + scale(I(DaysEmerg^2))+scale(TempC) + scale(I(TempC^2)) + scale(Rhperc) + scale(I(Rhperc^2)) +  scale(Wspeedmps) +  scale(I(Wspeedmps^2)) +(1|Site)+ ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+summary(temporal_auto)
+
+glmmTMB:::Anova.glmmTMB(temporal_auto)
+
+
+
+###
+check_singularity(temporal_auto) ##singular fit (random effect)##
+check_overdispersion(temporal_auto) ##good##
+check_collinearity(temporal_auto) ##good##
+check_zeroinflation(temporal_auto) ##model underfits zeroes###
+
+
+
+###null model with just site and auto correllation####
+
+null_auto<-glmmTMB(round(Countperhour) ~ (1|Site)+ ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+
+summary(null_auto)
+
+####
+
+rawaic<-AIC(null_auto,spatial_auto,   temporal_auto)
+nR<-dim(CO2counts2018cumsum)[1]  #Sample size 
+aictable(rawaic,nR) 
+
+
+### OF THESE 3, TEMPORAL MODEL IS THE BEST, FOLLOWED BY NULL, FOLLOWED BY SPATIAL ###
+
+
+```
+
+
+
+```{r glmm TMB C02 - AIC all models}
+
+#######null model with just site and auto correllation####
+
+null_auto<-glmmTMB(round(Countperhour) ~ (1|Site)+ ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+
+#TEMPORAL##autocorrellated model##### model diagnostics, ####
+
+temporal_auto<-glmmTMB(round(Countperhour) ~ scale(DaysEmerg) + scale(I(DaysEmerg^2))+scale(TempC) + scale(I(TempC^2)) + scale(Rhperc) + scale(I(Rhperc^2)) +  scale(Wspeedmps) +  scale(I(Wspeedmps^2)) +(1|Site)+ ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+
+temporal_auto_justtemp<-glmmTMB(round(Countperhour) ~ scale(DaysEmerg) + scale(I(DaysEmerg^2))+scale(TempC) + scale(I(TempC^2)) +(1|Site)+ ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+
+temporal_auto_justtempwind<-glmmTMB(round(Countperhour) ~ scale(DaysEmerg) + scale(I(DaysEmerg^2))+scale(TempC) + scale(I(TempC^2))+  scale(Wspeedmps) +(1|Site)+ ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+
+#SPATIAL##autocorrellated model##### model diagnostics look good####
+
+spatial_auto<-glmmTMB(round(Countperhour) ~ scale(Larvhab500m) +scale(DistRus)+scale(roughraster)+ ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)
+
+
+spatial_auto_justdist<-glmmTMB(round(Countperhour) ~ scale(DistRus)+ ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)
+
+###BOTH SPATIAL TEMPORAL###
+
+both_auto<-glmmTMB(round(Countperhour) ~ scale(DaysEmerg) + scale(I(DaysEmerg^2))+scale(TempC) + scale(I(TempC^2)) + scale(Rhperc) + scale(I(Rhperc^2)) +  scale(Wspeedmps) +  scale(I(Wspeedmps^2))+scale(Larvhab500m) +scale(DistRus)+scale(roughraster) +(1|Site)+ ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+both_auto_2<-glmmTMB(round(Countperhour) ~ scale(DaysEmerg) + scale(I(DaysEmerg^2))+scale(TempC) + scale(I(TempC^2)) +   scale(Wspeedmps) +scale(DistRus) +(1|Site)+ ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+
+both_auto_3<-glmmTMB(round(Countperhour) ~ scale(DaysEmerg) + scale(I(DaysEmerg^2))+scale(TempC) + scale(I(TempC^2)) + scale(Rhperc) + scale(I(Rhperc^2)) +scale(DistRus) +(1|Site)+ ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+
+both_auto_4<-glmmTMB(round(Countperhour) ~ scale(DaysEmerg) + scale(I(DaysEmerg^2))+scale(TempC) + scale(I(TempC^2)) + scale(Rhperc) + scale(I(Rhperc^2)) +  scale(Wspeedmps) +scale(DistRus) +(1|Site)+ ar1(as.factor(DaysEmerg)+0 |Site),  family=nbinom1(link="log"), data=CO2counts2018cumsum)  
+
+
+###########AIC OF ALL MODELS#######
+
+rawaic<-AIC(null_auto, temporal_auto, temporal_auto_justtemp, temporal_auto_justtempwind, spatial_auto, spatial_auto_justdist, both_auto, both_auto_2, both_auto_3, both_auto_4)
+nR<-dim(CO2counts2018cumsum)[1]  #Sample size 
+aictable(rawaic,nR) 
+
+###visualize effects##
+
+library(effects)
+
+plot(allEffects(both_auto_2))
+
+
+```
+
+
+
+#########GRAPHS################
+
+
+
+
+```{r graphs abundance over season 2017 2018}
+
+##filter out Golf and Forest because of messed up traps##
+
+
+C02traps20172018_2<-ggplot(C0220172018summary_2, aes(Date2, meancountperhour)) + geom_errorbar(aes(ymin=meancountperhour-secountperhour, ymax=meancountperhour+secountperhour), width=.1)+ facet_wrap(~Year,ncol=1)+ geom_point(na.rm=TRUE)+xlab("")+ylab(bquote(atop("Host-seeking adults" , (ind %.% trap^{-1} %.% ~hour^{-1}))))+mytheme+ geom_smooth(method = "lm", formula = y ~ splines::bs(x, 3), se = FALSE)+ theme(strip.text.x = element_blank())+ylim(0,400)+geom_point(data=justdummypoints,colour='red')+ geom_text(data  = dat_text,mapping = aes(x = Date2, y = meancountperhour, label = label))
+
+
+```
+
+
+```{r cumulative sum graph Co2}
+
+mytheme<- theme_bw()+ theme(axis.line.x= element_line(colour = "black", size=0.3))+theme(axis.line.y= element_line(colour = "black", size=0.3))+theme(axis.text.x=element_text(size=10, colour = "black"))+theme(axis.text.y=element_text(size=10, colour = "black"))+theme(axis.title=element_text(size=10))+theme(plot.title=element_text(size=7) +theme(plot.title = element_text(hjust = 0.5)))+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ theme(legend.position = "none")
+
+ 
+C02traps2018cumsum<-ggplot(CO2counts2018cumsum, aes(Date2, cumsum, color=Site)) + geom_point(na.rm=TRUE)+ geom_line(na.rm=TRUE)+xlab("")+ylab(bquote(atop("Cumulative sum" , (ind %.% trap^{-1} %.% ~hour^{-1}))))+mytheme
+
+
+jpeg("C:/Users/Melissa/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/cumulativesum2018.jpeg",width = 6, height = 4,units = 'in', res = 600)
+C02traps2018cumsum
+dev.off()
+
+
+C02traps2018cumsumLH<-ggplot(CO2counts2018cumsum, aes(Date2, cumsum,group=Site, color=Larvhab500m)) + geom_point(na.rm=TRUE)+ geom_line(na.rm=TRUE)+xlab("")+ylab(bquote(atop("Cumulative sum" , (ind %.% trap^{-1} %.% ~hour^{-1}))))+mytheme+ theme(legend.position = "right")+ scale_color_gradient(high = "blue", low = "red")
+
+jpeg("C:/Users/Melissa/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/cumulativesum2018LH.jpeg",width = 6, height = 4,units = 'in', res = 600)
+C02traps2018cumsumLH
+dev.off()
+
+latlong<-cbind(X=CO2counts2018cumsum$Lat, Y=CO2counts2018cumsum$Long)
+coordinates(latlong) <- ~ Y + X
+
+
+minx<-min(CO2counts2018cumsum$Easting-100)
+maxx<-max(CO2counts2018cumsum$Easting+100)
+miny<-min(CO2counts2018cumsum$Northing-100)
+maxy<-max(CO2counts2018cumsum$Northing+100)
+
+
+x<-CO2counts2018cumsum$Easting
+y<-CO2counts2018cumsum$Northing
+m<-CO2counts2018cumsum$Countperhour
+
+Q <- ppp(x, y, c(505000,535000),c(7430000,7445000), marks = m, markscale=0.005)
+plot(Q)
+
+LatLong <- data.frame(X = c(56.85359, 56.85478), Y = c(-118.4109, -118.4035))
+names(LatLong) <- c("X","Y")
+
+
+
+
+```
+
+```{r weather figure from Co2}
+
+CO2counts20172018subset
+
+
+##data in long form for graph##
+
+CO2counts_long <- gather(CO2counts20172018subset, weather, measurement, Wspeedmps:Rhperc, factor_key=TRUE)
+
+CO2counts_long2<-dplyr::select(CO2counts_long, c(Date, Date2, Site, SiteYear, weather, measurement, Countperhour, Timing))
+
+##subset to peak season##
+
+CO2counts_long3<-subset(CO2counts_long, Timing=="Peak")
+
+
+mytheme<- theme_bw()+ theme(axis.line.x= element_line(colour = "black", size=0.3))+theme(axis.line.y= element_line(colour = "black", size=0.3))+theme(axis.text.x=element_text(size=10, colour = "black"))+theme(axis.text.y=element_text(size=10, colour = "black"))+theme(axis.title=element_text(size=12))+theme(plot.title=element_text(size=14) +theme(plot.title = element_text(hjust = 0.5)))+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ theme(legend.position = "none")
+
+
+### 3 panel figure##
+
+CO2counts_long3$weather<- plyr::revalue(x = CO2counts_long3$weather, c("TempC" = "Air temperature (C)", "Wspeedmps" = "Wind speed (m/s)", "Rhperc" = "Relative humidity (%)"))
+
+CO2counts_long3$weather<- factor(CO2counts_long3$weather, levels = c("TempC" = "Air temperature (C)", "Wspeedmps" = "Wind speed (m/s)", "Rhperc" = "Relative humidity (%)"))
+
+CO2counts_long3$Year<-as.factor(as.character(CO2counts_long3$Year))
+
+Weatherplots<-ggplot(CO2counts_long3, aes(x=measurement, y=Countperhour, group=Year, shape=Year, fill=Year)) + geom_point(size=1.5)+ylab(bquote(atop("Host-seeking adults" , (ind %.% trap^{-1} %.% ~hour^{-1}))))+mytheme+facet_wrap(~weather, scales = "free_x", strip.position = "bottom", ncol=1)+ theme(strip.background = element_blank(), strip.placement = "outside")+theme(axis.title.x = element_blank(),strip.background = element_blank())+scale_shape_manual(values = c(21, 22))+scale_fill_manual(values = c("grey 32", "grey 71"))+theme(strip.text.x =element_text(size = 12, colour = "black"))+ theme(legend.position = "right")
+
+
+
+###
+
+jpeg("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/Weatherggplot.jpeg",width = 3, height = 6,units = 'in', res = 600)
+Weatherplots
+dev.off()
+
+
+
+
+```
+
+
+```{r Supplemental density plots}
+
+N0dens2<-N0dens%>% ungroup()%>% dplyr::select(Pond2, Site, Totalliter)%>%mutate(lifestage="Larvae")
+
+
+colnames(N0dens2)[which(names(N0dens2) == "Pond2")] <- "Sitecode"
+colnames(N0dens2)[which(names(N0dens2) == "")] <- "Sitecode"
+
+
+emergencebysamplingstation2<-emergencebysamplingstation %>% ungroup()%>% dplyr::select(Sitecode, SS, cumemerg2)%>%mutate(lifestage="Emergence")
+
+sweep2018_5<-sweep2018sitedate_4%>% ungroup()%>% dplyr::select(Sitecode, Sample, Totaladjust)%>%mutate(lifestage="Resting")
+
+sweepgravid2018_5<-sweep2018sitedate_4%>% ungroup()%>% dplyr::select(Sitecode, Sample, Gravidadjust) %>%mutate(lifestage="Gravid")
+
+CO2counts2018subset_5<-CO2counts2018subset_4 %>% ungroup()%>% dplyr::select(Sitecode, Date, Countperhour) %>%mutate(lifestage="Hostseeking")
+
+
+
+
+names(N0dens2)<-names(emergencebysamplingstation2)
+names(sweep2018_5) <- names(emergencebysamplingstation2) 
+names(sweepgravid2018_5) <- names(emergencebysamplingstation2) 
+names(CO2counts2018subset_5) <- names(emergencebysamplingstation2) 
+
+
+#########
+
+combineddata<-rbind(N0dens2,emergencebysamplingstation2,sweep2018_5,sweepgravid2018_5,CO2counts2018subset_5)
+
+combineddata$Sitecode <- factor(combineddata$Sitecode, levels = c("1", "F1a", "1a", "1b", "F1b", "1c", "2a", "F2a", "F3a", "3", "3a", "F3b", "4"))
+
+combineddata$lifestage <- factor(combineddata$lifestage, levels = c("Larvae", "Emergence", "Hostseeking", "Resting", "Gravid"))
+
+
+means<-combineddata %>% group_by(lifestage) %>% summarise_at(vars(cumemerg2), list(name = mean))
+
+
+dummy1 <- data.frame(lifestage = c("Larvae", "Emergence", "Hostseeking", "Resting", "Gravid"), cumemerg2 = c(50, 82.9, 160, 73.5, 1.94))
+
+dummy2 <- data.frame(lifestage = c("Larvae", "Emergence", "Hostseeking", "Resting", "Gravid"), Sitecode=c("2a", "2a", "2a", "2a", "2a"), cumemerg2=c(600, 515, 1000, 320, 12), label = c("Larvae per liter", "Adults in emergence traps", "Host-seeking females in CO2 traps", "Resting females in sweep nets", "Gravid females in sweep nets"))
+
+
+combineddatameans<- combineddata%>% group_by(lifestage, Sitecode) %>% dplyr::summarise(n=n(), mean=mean(cumemerg2 , na.rm=TRUE))
+
+
+
+allstagesboxplot<-combineddata %>%
+  ggplot(aes(x=Sitecode, y=cumemerg2)) +
+  facet_wrap(~lifestage,scales = "free_y", ncol=1)+ 
+   geom_boxplot() +
+   geom_hline(data = dummy1, aes(yintercept = cumemerg2), color="red")+
+   theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    xlab("Site")+
+    ylab("Mosquito Abundance")+
+    mytheme+
+    geom_text(data = dummy2,label = dummy2$label)+
+     theme(strip.background = element_blank())+
+     theme(strip.text.x = element_blank())
+    
+####Just larvae, emerging adults, Host-seeking females in C02 traps###
+
+
+head(combineddata)
+combineddata2<-subset(combineddata, lifestage=="Larvae"|lifestage=="Emergence"|lifestage=="Hostseeking")
+dummy11<-subset(dummy1, lifestage=="Larvae"|lifestage=="Emergence"|lifestage=="Hostseeking")
+dummy22<-subset(dummy2, lifestage=="Larvae"|lifestage=="Emergence"|lifestage=="Hostseeking")
+
+combineddata2$lifestage <- factor(combineddata2$lifestage, levels = c("Larvae", "Emergence", "Hostseeking", "Resting", "Gravid"))
+dummy11$lifestage <- factor(dummy11$lifestage, levels = c("Larvae", "Emergence", "Hostseeking", "Resting", "Gravid"))
+dummy22$lifestage <- factor(dummy22$lifestage, levels = c("Larvae", "Emergence", "Hostseeking", "Resting", "Gravid"))
+
+larvaeemerCO2<-combineddata2 %>%
+  ggplot(aes(x=Sitecode, y=cumemerg2)) +
+  facet_wrap(~lifestage,scales = "free_y", ncol=1)+ 
+   geom_boxplot() +
+   geom_hline(data = dummy11, aes(yintercept = cumemerg2), color="red")+
+   theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    xlab("Site")+
+    ylab("log(Mosquito Abundance)")+
+    mytheme+
+    geom_text(data = dummy22,label = dummy22$label)+
+     theme(strip.background = element_blank())+
+     theme(strip.text.x = element_blank())
+
+    
+###same thing on a log###
+
+combineddata4<-combineddata2 %>% mutate(plus1=cumemerg2+1)
+dummy111<-dummy11%>% mutate(plus1=cumemerg2+1)
+dummy222<-dummy22%>% mutate(plus1=cumemerg2+1)
+
+
+loglarvaeemerCO2_2<-combineddata4 %>%
+  ggplot(aes(x=Sitecode, y=plus1)) +
+  facet_wrap(~lifestage,scales = "free_y", ncol=1)+ 
+   geom_boxplot() +
+   geom_hline(data = dummy111, aes(yintercept = cumemerg2), color="red")+
+   theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    xlab("Site")+
+    ylab("log10( 1 + Mosquito Abundance )")+
+    mytheme+
+    geom_text(data = dummy222,label = dummy222$label)+
+     theme(strip.background = element_blank())+
+     theme(strip.text.x = element_blank())+
+     scale_y_continuous(trans='log10')
+
+
+
+jpeg("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/loglarvaeemerCO2.jpeg",width = 6, height = 5,units = 'in', res = 600)
+loglarvaeemerCO2_2
+dev.off()
+
+
+###larvae vs. emergence traps####
+
+combineddata3<-subset(combineddata, lifestage=="Larvae"|lifestage=="Emergence")
+
+summarylarvemerg<-combineddata3%>% group_by(Sitecode, lifestage) %>% dplyr::summarise(meanval=mean(cumemerg2, na.rm=TRUE))
+
+summarylarv<-subset(summarylarvemerg, lifestage=="Larvae")
+summaryemerg<-subset(summarylarvemerg, lifestage=="Emergence")
+
+both<-data.frame(Sitecode=as.factor(as.character(summarylarv$Sitecode)), larv=summarylarv$meanval, emer=summaryemerg$meanval)
+
+larvemergplot<-ggplot(both, aes(x=larv, y=emer, label=as.factor(as.character(Sitecode))))+ geom_point(na.rm=TRUE)+xlab("log( Early instar larvae / liter)")+ylab("log( Adults / emerg trap) ")+mytheme+
+     scale_y_continuous(trans='log10')+
+     scale_x_continuous(trans='log10')+geom_text(hjust=0, vjust=0, nudge_x = 0.02)
+
+
+jpeg("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/larvaeemerg.jpeg",width = 3, height = 3,units = 'in', res = 600)
+larvemergplot
+dev.off()
+
+
+####resting adults, prop gravid####
+
+
+head(sweep2018)
+
+modeldaterandomZI2<-glmmTMB(round(Total) ~ Site2+ (1|Samplingevent),  family=nbinom2(link="log"), ziformula=~Site2, data=sweep2018) 
+propgravid_norand<-glmmTMB((Gravid/Total) ~ Site2+ as.numeric(Samplingevent), family=binomial, data=sweep2018) 
+
+
+
+restingmeans<-lsmeans(modeldaterandomZI2, ~Site2, type = "response")
+gravidmeans<-lsmeans(propgravid_norand, ~Site2, type="response")
+
+restingmeansdf <- summary(restingmeans)
+gravidmeansdf<-summary(gravidmeans)
+
+bothmeans<-data.frame(Site2=restingmeansdf$Site2, restingnum=restingmeansdf$response, restingSE=restingmeansdf$SE, propgravid=gravidmeansdf$response, propSE=gravidmeansdf$SE)
+
+bothmeans2<-bothmeans %>% mutate("Number of gravid females"=propgravid*restingnum, "Number of non-gravid females"=restingnum-(propgravid*restingnum))
+
+###wide to long###
+
+bothmeans_long <- gather(bothmeans2, status, number, "Number of gravid females":"Number of non-gravid females", factor_key=TRUE)
+
+
+##plot##
+
+mytheme<- theme_bw()+ theme(axis.line.x= element_line(colour = "black", size=0.3))+theme(axis.line.y= element_line(colour = "black", size=0.3))+theme(axis.text.x=element_text(size=10, colour = "black"))+theme(axis.text.y=element_text(size=10, colour = "black"))+theme(axis.title=element_text(size=10))+theme(plot.title=element_text(size=7) +theme(plot.title = element_text(hjust = 0.5)))+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+
+propgravid2<-data.frame(Site2=unique(bothmeans_long$Site2), restingnum=unique(bothmeans_long$restingnum), propgravid=unique(bothmeans_long$propgravid))
+
+gravidplot<-ggplot()+ geom_bar(data=bothmeans_long, aes(fill=status, y=number, x=Site2), position="stack", stat="identity")+ylab("Number of resting adults / sweep")+mytheme+
+  theme(legend.position = c(0.75, 0.8)) + scale_fill_manual(values = c("red", "grey"))+theme(legend.title=element_blank())+
+  geom_text(data=propgravid2, aes(x= Site2, y = restingnum, label = round(propgravid,3)*100), vjust = 1.5, colour = c("red"), size=2)
+
+
+jpeg("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/gravidplot.jpeg",width = 5, height = 3,units = 'in', res = 600)
+gravidplot
+dev.off()
+
+
+```
+
+
+```{r cumulative sums log mean to log variance plot}
+
+#####emergtraps###
+emer1trap$meanemerg
+emerwholepond$standemerg
+
+####c02 traps###
+CO2counts2018_cumsum_bysite$cumsumadjust
+
+#####cumulative number in sweep nets 
+sweepcumulative_4$cumsumTotoladjust
+
+#####cumulative gravid in sweep nets 
+sweepcumulative_4$cumsumTGravidadjust
+
+####
+lifestage<-c("Emerging adults", "Host-seeking females", "Resting females", "Gravid females")
+
+means<-c(mean(emer1trap$meanemerg), mean(CO2counts2018_cumsum_bysite$cumsumadjust), mean(sweepcumulative_4$cumsumTotoladjust), mean(sweepcumulative_4$cumsumTGravidadjust))
+
+logmeans<-log(means)
+
+vars<-c(var(emer1trap$meanemerg), var(CO2counts2018_cumsum_bysite$cumsumadjust), var(sweepcumulative_4$cumsumTotoladjust), var(sweepcumulative_4$cumsumTGravidadjust))
+
+logvars<-log(vars)
+
+meanvar<-as.data.frame(cbind(lifestage, means, vars, logmeans, logvars))
+
+###simulate data for graph###
+
+x<-seq(1, 25, by=2)
+y1<- x
+y2<- 2 * x
+y3<- x^2
+ypredict<-x*1.7712
+
+simdata<-as.data.frame(cbind(x, y1, y2, y3, ypredict))
+
+lm1<-lm(as.numeric(as.character(logvars))~as.numeric(as.character(logmeans)), data=meanvar)
+
+######
+
+logmeanvarplot<-ggplot(meanvar, aes(as.numeric(as.character(logmeans)), as.numeric(as.character(logvars)))) + geom_point(na.rm=TRUE)+xlab("log(Mean)")+ylab("log(Variance)")+xlim(1, 14)+ylim(1,20)+mytheme+geom_line(data=simdata, aes(x,y1),colour="blue")+geom_line(data=simdata, aes(x,ypredict),colour="black")+geom_line(data=simdata, aes(x,y2),colour="red")+ geom_text(aes(label=lifestage),hjust=-0.1, vjust=0)+ annotate(geom="text", x=12, y=6, label="y = x",color="blue")+ annotate(geom="text", x=12, y=4, label="y = 1.77x",color="black")+ annotate(geom="text", x=12, y=2, label="y = 2x",color="red")
+
+
+jpeg("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/logmeanvar.jpeg",width = 4, height = 4,units = 'in', res = 600)
+logmeanvarplot
+dev.off()
+
+```
+
+
