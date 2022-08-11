@@ -29,6 +29,7 @@ library(insight)
 library(performance)
 library(spatstat)
 library(here)
+library(DHARMa)
 #library(modEvA)
 
 base_breaks <- function(n = 10){
@@ -40,6 +41,7 @@ base_breaks <- function(n = 10){
 ```
 
 
+####### FUNCTION DEFINITIONS ###########
 
 ```{r AIC function}
 
@@ -272,7 +274,7 @@ cod <- function(x) {
 ```
 
 
-#######UPLOAD DATA###########
+####### UPLOAD DATA FROM GITHUB ###########
 
 ```{r upload emergence trap data 2018}
 
@@ -292,12 +294,7 @@ emergencetraps<-emergencetraps %>% mutate(Sitecode=Pond.1)
 
 ##c02##
 
-CO2counts20172018<- read.csv("Adultmosquitoes/data/C02counts_weather2017_2018.csv") 
-
-#### wind speeds were updated from 2018 to be in the same units as 2017###
-## on 7/20/21 I added topographic roughness values from RAF,...###
-
-
+CO2counts20172018<- read.csv(here("Adultmosquitoes/data/C02counts_weather2017_2018.csv")) 
 
 CO2counts20172018$Year <- as.factor(CO2counts20172018$Year)
 CO2counts20172018$Date<-as.Date(CO2counts20172018$Date, format = "%m/%d/%Y") 
@@ -305,7 +302,7 @@ CO2counts20172018$Date2<-as.Date(CO2counts20172018$Date2, format = "%m/%d/%Y")
 
 
 
-C02sitechar<- read.csv("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/C02traps/C02sitechar.csv")
+C02sitechar<- read.csv(here("Adultmosquitoes/data/C02sitechar.csv"))
 
 C02sitechar$Site2 <- as.factor(C02sitechar$Site2)
 
@@ -326,10 +323,11 @@ CO2counts20172018subset$Sitecode<-plyr::mapvalues(CO2counts20172018subset$Siteco
 
 
 ```{r upload sweep net data 2018}
+
 ##Sweep net 2018## ##from each sweep individual##
 
 
-sweep2018<- read.csv("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Sweepnet/2018/Sweep2018.csv")
+sweep2018<- read.csv(here("Adultmosquitoes/data/Sweep2018.csv"))
 
 sweep2018$Date<-as.Date(sweep2018$Date, format = "%m/%d/%Y") 
 
@@ -337,8 +335,6 @@ sweep2018_2<-sweep2018%>% mutate(Jdate=yday(sweep2018$Date))
 
 sweep2018$Sample<-as.factor(sweep2018$Sample)
 sweep2018$Site2<-as.factor(sweep2018$Site2)
-
-sweep2018$Samplingevent<-as.factor(sweep2018$Samplingevent)
 
 sweep2018<- sweep2018 %>% mutate(Sitecode=Pond)
 
@@ -348,9 +344,11 @@ sweep2018$Sitecode<-plyr::mapvalues(sweep2018$Sitecode, c("East", "Golf", "Ice",
 
 ```
 
+
 ```{r upload larval data 2018}
 
-invertcounts2018<- read.csv("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/C-R paper/Data and analysis/Inputs/invertcountsperimemerg2018.csv")
+invertcounts2018<- read.csv(here("C-R dynamics arctic ponds/Data and analysis/2_Inputs/invertcountsperimemerg2018.csv"))
+
 invertcounts2018$Date <- as.Date(invertcounts2018$Date, "%m/%d/%Y")
 
 
@@ -490,9 +488,6 @@ dev.off()
 
 ##Sweep net 2018## ##from each sweep individual##
 
-head(sweep2018)
-
-
 ##First, sum up the total number caught in 6 sweeps per site per date###
 
 sweep2018sitedate<-sweep2018 %>% group_by(SiteYear, Date) %>% summarise(Total= sum(Total), Gravid = sum(Gravid))
@@ -619,7 +614,7 @@ sweepcumulative_4$cumsumTGravidadjust
 
 ## emer traps###
 poisemerg <- glm(round(meanemerg) ~ 1, data = emer1trap, family = poisson)
-poisemerg2 <- glm(round(standemerg) ~ 1, data = emerwholepond, family = poisson)
+#poisemerg2 <- glm(round(standemerg) ~ 1, data = emerwholepond, family = poisson)
 
 nbemerg <- glm.nb(round(meanemerg) ~ 1, data = emer1trap, control=glm.control(maxit=100))
 
@@ -709,6 +704,7 @@ dispersiontest(poissweepgravid, trafo=2)
 
 
 modelemergnb<-glmmTMB(round(cumemerg2) ~ Pond,  family=nbinom1(link="log"), data=emergencebysamplingstation)  
+
 modelemergnb2<-glmmTMB(round(cumemerg2) ~ Pond,  family=nbinom2(link="log"), data=emergencebysamplingstation)  
 
 modelemergpois<-glmmTMB(round(cumemerg2) ~ Pond,  family=poisson(link="log"), data=emergencebysamplingstation)  
@@ -758,10 +754,11 @@ model1sweep<-glmmTMB(round(Total) ~ SiteYear,  family=nbinom1(link="log"), data=
 # plot residuals
 sweep2018$resid <- resid(model1sweep)
 
-ggplot(sweep2018, aes(x = Lat, y = Long, size = resid)) +
+sweepspatialauto<-ggplot(sweep2018, aes(x = Lat, y = Long, size = resid)) +
   geom_point() +
   scale_size_continuous(range = c(1,10))
 
+###no obvious spatial autocorrellation from figure####
 
 
 ####
@@ -779,26 +776,17 @@ testSpatialAutocorrelation(sims22, x = x_unique1, y = y_unique1)
 
 ###check for temporal autocorrellations###
 
-
 model1 <- glm.nb(round(Total)~Date*Site2, data = sweep2018)
 
 acf(model1$residuals, type = "correlation")
 
-####very mild evidence for autocorrellation....####
-
-##Try with sampling event####
-
-model2 <- glm.nb(round(Total)~Samplingevent*Site2, data = sweep2018)
-
-acf(model2$residuals, type = "correlation")
-
-###no real autocorrelation with the sampling event instead of date...###
+####very mild evidence for temporal autocorrellation....####
 
 ###doesn't really make sense here to build an autocorrellated model since dates are not evenly spaced...??##
 
 
 
-###trying some mixed effects models####
+###mixed effects models####
 
 modelsamplerandom<-glmmTMB(round(Total) ~ SiteYear+ (1|Samplingevent),  family=nbinom1(link="log"), data=sweep2018)  
 
@@ -854,9 +842,6 @@ lsmeans(modeldaterandomZI2, ~SiteYear, type = "response")
 
 ```{r sweep GLMs prop gravid}
 
-
-
-
 #######Models for proportion GRAVID###
 
 propgravidZI2<-glmmTMB((Gravid/Total) ~ SiteYear+ (1|Samplingevent), zi=~., family=binomial, data=sweep2018) 
@@ -868,7 +853,6 @@ AIC(propgravidZI2, propgravid) ## model without zero inflation is better###
 
 ####
 check_overdispersion(propgravid)  ###overdispersion accounted for ###
-check_singularity(propgravid) ##TRUE...Hmmmm###
 
 #####Try model with date as a fixed instead of random effect#####
 
@@ -953,11 +937,6 @@ CO2counts2018cumsum$resid <- resid(model1)
 ggplot(CO2counts2018cumsum, aes(x = Lat, y = Long, size = resid)) +
   geom_point() +
   scale_size_continuous(range = c(1,10))
-
-
-sims <- simulateResiduals(model1)
-
-testSpatialAutocorrelation(sims, x = CO2counts2018cumsum$Lat, y = CO2counts2018cumsum$Long, plot = FALSE)
 
 
 ####
@@ -1210,41 +1189,14 @@ mytheme<- theme_bw()+ theme(axis.line.x= element_line(colour = "black", size=0.3
 C02traps2018cumsum<-ggplot(CO2counts2018cumsum, aes(Date2, cumsum, color=Site)) + geom_point(na.rm=TRUE)+ geom_line(na.rm=TRUE)+xlab("")+ylab(bquote(atop("Cumulative sum" , (ind %.% trap^{-1} %.% ~hour^{-1}))))+mytheme
 
 
-jpeg("C:/Users/Melissa/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/cumulativesum2018.jpeg",width = 6, height = 4,units = 'in', res = 600)
-C02traps2018cumsum
-dev.off()
-
 
 C02traps2018cumsumLH<-ggplot(CO2counts2018cumsum, aes(Date2, cumsum,group=Site, color=Larvhab500m)) + geom_point(na.rm=TRUE)+ geom_line(na.rm=TRUE)+xlab("")+ylab(bquote(atop("Cumulative sum" , (ind %.% trap^{-1} %.% ~hour^{-1}))))+mytheme+ theme(legend.position = "right")+ scale_color_gradient(high = "blue", low = "red")
-
-jpeg("C:/Users/Melissa/Dropbox/Mosquito Science (1)/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/cumulativesum2018LH.jpeg",width = 6, height = 4,units = 'in', res = 600)
-C02traps2018cumsumLH
-dev.off()
-
-latlong<-cbind(X=CO2counts2018cumsum$Lat, Y=CO2counts2018cumsum$Long)
-coordinates(latlong) <- ~ Y + X
-
-
-minx<-min(CO2counts2018cumsum$Easting-100)
-maxx<-max(CO2counts2018cumsum$Easting+100)
-miny<-min(CO2counts2018cumsum$Northing-100)
-maxy<-max(CO2counts2018cumsum$Northing+100)
-
-
-x<-CO2counts2018cumsum$Easting
-y<-CO2counts2018cumsum$Northing
-m<-CO2counts2018cumsum$Countperhour
-
-Q <- ppp(x, y, c(505000,535000),c(7430000,7445000), marks = m, markscale=0.005)
-plot(Q)
-
-LatLong <- data.frame(X = c(56.85359, 56.85478), Y = c(-118.4109, -118.4035))
-names(LatLong) <- c("X","Y")
 
 
 
 
 ```
+
 
 ```{r weather figure from Co2}
 
@@ -1274,14 +1226,6 @@ CO2counts_long3$weather<- factor(CO2counts_long3$weather, levels = c("TempC" = "
 CO2counts_long3$Year<-as.factor(as.character(CO2counts_long3$Year))
 
 Weatherplots<-ggplot(CO2counts_long3, aes(x=measurement, y=Countperhour, group=Year, shape=Year, fill=Year)) + geom_point(size=1.5)+ylab(bquote(atop("Host-seeking adults" , (ind %.% trap^{-1} %.% ~hour^{-1}))))+mytheme+facet_wrap(~weather, scales = "free_x", strip.position = "bottom", ncol=1)+ theme(strip.background = element_blank(), strip.placement = "outside")+theme(axis.title.x = element_blank(),strip.background = element_blank())+scale_shape_manual(values = c(21, 22))+scale_fill_manual(values = c("grey 32", "grey 71"))+theme(strip.text.x =element_text(size = 12, colour = "black"))+ theme(legend.position = "right")
-
-
-
-###
-
-jpeg("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/Weatherggplot.jpeg",width = 3, height = 6,units = 'in', res = 600)
-Weatherplots
-dev.off()
 
 
 
@@ -1407,11 +1351,6 @@ loglarvaeemerCO2_2<-combineddata4 %>%
 
 
 
-jpeg("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/loglarvaeemerCO2.jpeg",width = 6, height = 5,units = 'in', res = 600)
-loglarvaeemerCO2_2
-dev.off()
-
-
 ###larvae vs. emergence traps####
 
 combineddata3<-subset(combineddata, lifestage=="Larvae"|lifestage=="Emergence")
@@ -1426,11 +1365,6 @@ both<-data.frame(Sitecode=as.factor(as.character(summarylarv$Sitecode)), larv=su
 larvemergplot<-ggplot(both, aes(x=larv, y=emer, label=as.factor(as.character(Sitecode))))+ geom_point(na.rm=TRUE)+xlab("log( Early instar larvae / liter)")+ylab("log( Adults / emerg trap) ")+mytheme+
      scale_y_continuous(trans='log10')+
      scale_x_continuous(trans='log10')+geom_text(hjust=0, vjust=0, nudge_x = 0.02)
-
-
-jpeg("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/larvaeemerg.jpeg",width = 3, height = 3,units = 'in', res = 600)
-larvemergplot
-dev.off()
 
 
 ####resting adults, prop gravid####
@@ -1470,9 +1404,6 @@ gravidplot<-ggplot()+ geom_bar(data=bothmeans_long, aes(fill=status, y=number, x
   geom_text(data=propgravid2, aes(x= Site2, y = restingnum, label = round(propgravid,3)*100), vjust = 1.5, colour = c("red"), size=2)
 
 
-jpeg("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/gravidplot.jpeg",width = 5, height = 3,units = 'in', res = 600)
-gravidplot
-dev.off()
 
 
 ```
@@ -1523,9 +1454,6 @@ lm1<-lm(as.numeric(as.character(logvars))~as.numeric(as.character(logmeans)), da
 logmeanvarplot<-ggplot(meanvar, aes(as.numeric(as.character(logmeans)), as.numeric(as.character(logvars)))) + geom_point(na.rm=TRUE)+xlab("log(Mean)")+ylab("log(Variance)")+xlim(1, 14)+ylim(1,20)+mytheme+geom_line(data=simdata, aes(x,y1),colour="blue")+geom_line(data=simdata, aes(x,ypredict),colour="black")+geom_line(data=simdata, aes(x,y2),colour="red")+ geom_text(aes(label=lifestage),hjust=-0.1, vjust=0)+ annotate(geom="text", x=12, y=6, label="y = x",color="blue")+ annotate(geom="text", x=12, y=4, label="y = 1.77x",color="black")+ annotate(geom="text", x=12, y=2, label="y = 2x",color="red")
 
 
-jpeg("C:/Users/Melissa/Dropbox/Mosquito Science/Data 2011 to 2018/Github repository/Arctic_mosquito/Adultpaper/Figures/logmeanvar.jpeg",width = 4, height = 4,units = 'in', res = 600)
-logmeanvarplot
-dev.off()
 
 ```
 
